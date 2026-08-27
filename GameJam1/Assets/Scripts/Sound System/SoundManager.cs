@@ -25,8 +25,13 @@ public class SoundManager : MonoBehaviour
     private bool playlistActive;
     private bool musicStopped = false;
     private bool trackStarted = false;
-
-
+    
+    //extra function linked to volume slider
+    private void LoadVolumes()
+    {
+        musicSource.volume = PlayerPrefs.GetFloat("musicVolume", 1f);
+        sfxSource.volume = PlayerPrefs.GetFloat("sfxVolume", 1f);
+    }
     private void Awake()
     {
         if (Instance != null)
@@ -37,6 +42,7 @@ public class SoundManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        LoadVolumes();
     }
 
     private void Start()
