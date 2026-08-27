@@ -5,10 +5,15 @@ using TMPro;
 public class GoalUI : MonoBehaviour
 {
     [SerializeField] private GoalManager goalManager;
-    [SerializeField] private Image[] goalImages;
-    [SerializeField] private TMP_Text[] goalCountTexts; // shows "current/required"
     [SerializeField] private GameObject winPanel; // optional, shown on win
 
+    [Header("Needed to WIN")]
+    [SerializeField] private Image[] goalImages;
+    [SerializeField] private TMP_Text[] goalCountTexts; // shows "current/required"
+
+    [Header("Extras")]
+    [SerializeField] private Image extraImage;
+    [SerializeField] private TMP_Text extraCountText;
     private void OnEnable()
     {
         goalManager.OnGoalProgressChanged += RefreshUI;
@@ -40,7 +45,14 @@ public class GoalUI : MonoBehaviour
             if (goalCountTexts[i])
                 goalCountTexts[i].text = $"{collected}/{req.requiredAmount}";
         }
+        if (extraCountText)
+        {
+            int totalExtras = goalManager.GetExtraCollectedAmount();
+            extraCountText.text = totalExtras.ToString();
+        }
     }
+
+    
 
     private void ShowWin()
     {
