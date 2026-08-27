@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3403484288900935580}
   m_Layer: 0
   m_Name: Capsule
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -126,6 +126,7 @@ GameObject:
   - component: {fileID: 3599364949617460923}
   - component: {fileID: 2985512402070707624}
   - component: {fileID: 1780673395906834871}
+  - component: {fileID: 7166830658690783085}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -163,7 +164,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   moveSpeed: 8
   rotationSpeed: 10
-  dashSpeed: 25
+  dashSpeed: 30
   dashDuration: 0.5
   dashCooldown: 1.5
   isDashing: 0
@@ -210,7 +211,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -218,3 +219,18 @@ CapsuleCollider:
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7166830658690783085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4991598906266509147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca05686ffa020b54192dad971a8bede5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Pocket
+  slots:
+  - item: {fileID: 11400000, guid: cb64d67d043b87a47ae7fc58457d3d5a, type: 2}
+    quantity: 0

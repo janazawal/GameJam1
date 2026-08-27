@@ -1,4 +1,4 @@
-using NUnit.Framework.Interfaces;
+using System.Collections.Generic;
 using System;
 using UnityEngine;
 
@@ -11,13 +11,17 @@ public class InventorySlot
 
 public class Pocket : MonoBehaviour
 {
-    [SerializeField] private InventorySlot[] slots; 
+    [SerializeField] private InventorySlot[] slots;
+    [SerializeField] private InventorySlot extraSlot = new InventorySlot();
 
     public event Action OnInventoryChanged;
     public InventorySlot[] Slots => slots;
+    public InventorySlot ExtraSlot => extraSlot;
 
     public bool AddItem(Items item)
     {
+        if (item == null) return false;
+
         foreach (var slot in slots)
         {
             if (slot.item == item)
@@ -28,6 +32,9 @@ public class Pocket : MonoBehaviour
             }
         }
 
-        return false;
+        // If it's an extra item, accumulate it into the single extra slot
+        extraSlot.quantity++;
+        OnInventoryChanged?.Invoke();
+        return true;
     }
 }
