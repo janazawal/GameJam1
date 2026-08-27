@@ -250,7 +250,6 @@ GameObject:
   m_Component:
   - component: {fileID: 242543124431667248}
   - component: {fileID: 5559634744799484144}
-  - component: {fileID: 8250502289370563937}
   - component: {fileID: 8321713387853322875}
   m_Layer: 5
   m_Name: PocketPanel
@@ -305,21 +304,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &8250502289370563937
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6060710602142506064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca05686ffa020b54192dad971a8bede5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Pocket
-  slots:
-  - item: {fileID: 11400000, guid: cb64d67d043b87a47ae7fc58457d3d5a, type: 2}
-    quantity: 0
 --- !u!114 &8321713387853322875
 MonoBehaviour:
   m_ObjectHideFlags: 0
