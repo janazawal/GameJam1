@@ -1139,6 +1139,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4844361489279155257, guid: a3a2acdda66c4a84c889ab73825fba1f, type: 3}
+      propertyPath: soundList.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4844361489279155257, guid: a3a2acdda66c4a84c889ab73825fba1f, type: 3}
+      propertyPath: 'soundList.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: c9e9520a91b55284e8ec945b24fd2acd, type: 3}
     - target: {fileID: 7221449576125554280, guid: a3a2acdda66c4a84c889ab73825fba1f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 305.77057
@@ -1394,6 +1402,7 @@ GameObject:
   - component: {fileID: 1121291342}
   - component: {fileID: 1121291341}
   - component: {fileID: 1121291344}
+  - component: {fileID: 1121291345}
   m_Layer: 5
   m_Name: Sound
   m_TagString: Untagged
@@ -1528,6 +1537,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TogglePanel
   panel: {fileID: 1273764394}
+--- !u!114 &1121291345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1121291339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b0a3855b1f9b134aa0b733df826a04b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonAnimation
+  hoverScale: 1.1
+  clickScale: 0.9
+  duration: 0.15
+  ignoreTimeScale: 1
 --- !u!1 &1202819365
 GameObject:
   m_ObjectHideFlags: 0

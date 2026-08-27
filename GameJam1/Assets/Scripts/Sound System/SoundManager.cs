@@ -4,7 +4,7 @@ using UnityEngine;
 //Put sound you want in enum then in its script write "SoundManager.PlaySound(SoundType.X)"
 public enum SoundType
 {
-     
+     Button
 }
 
 public class SoundManager : MonoBehaviour
