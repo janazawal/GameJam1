@@ -27,6 +27,22 @@ public class VolumeSlider : MonoBehaviour
         Load();
     }
 
+    private void OnEnable()
+    {
+        SyncSliderToCurrentVolume();
+    }
+
+    private void SyncSliderToCurrentVolume()
+    {
+        if (SoundManager.Instance == null) return;
+
+        float current = volumeType == VolumeType.Music
+            ? SoundManager.Instance.InstanceMusicVolume
+            : SoundManager.Instance.InstanceSFXVolume;
+
+        volumeSlider.SetValueWithoutNotify(current); // updates position WITHOUT re-triggering ChangeVolume
+    }
+
     public void ChangeVolume()
     {
         ApplyVolume(volumeSlider.value);
