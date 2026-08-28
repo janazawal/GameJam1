@@ -3,18 +3,48 @@ using UnityEngine;
 
 public class CartInventory : MonoBehaviour
 {
-    private Dictionary<ProductID, int> products = new Dictionary<ProductID, int>();
+    [SerializeField] private Transform productContainer;
 
-    public void AddProduct(ProductID productID, int amount = 1)
+    private Dictionary<ProductID, int> products =
+        new Dictionary<ProductID, int>();
+    private void MoveProductToCart(GameObject productObject)
+    {
+        if (productObject == null)
+            return;
+
+        Rigidbody rb = productObject.GetComponent<Rigidbody>();
+
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.isKinematic = true;
+        }
+
+        Collider col = productObject.GetComponent<Collider>();
+
+        if (col != null)
+        {
+            col.enabled = false;
+        }
+
+        productObject.transform.SetParent(productContainer, false);
+
+        productObject.transform.localPosition = Vector3.zero;
+        productObject.transform.localRotation = Quaternion.identity;
+    }
+    public void AddProduct(ProductID productID, GameObject productObject)
     {
         if (products.ContainsKey(productID))
         {
-            products[productID] += amount;
+            products[productID]++;
         }
         else
         {
-            products.Add(productID, amount);
+            products.Add(productID, 1);
         }
+
+        MoveProductToCart(productObject);
 
         Debug.Log($"{productID} in cart: {products[productID]}");
     }
@@ -27,18 +57,5 @@ public class CartInventory : MonoBehaviour
         }
 
         return 0;
-    }
-
-    public void RemoveProduct(ProductID productID, int amount = 1)
-    {
-        if (!products.ContainsKey(productID))
-            return;
-
-        products[productID] -= amount;
-
-        if (products[productID] <= 0)
-        {
-            products.Remove(productID);
-        }
     }
 }

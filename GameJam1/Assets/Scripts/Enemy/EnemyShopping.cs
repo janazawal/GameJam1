@@ -58,14 +58,30 @@ public class EnemyShopping : MonoBehaviour
 
         ShoppingItem currentItem = shoppingList[currentItemIndex];
 
-        cartInventory.AddProduct(
-            currentItem.productID,
-            currentItem.requiredAmount
-        );
+        Shelf targetShelf = shelfRegistry.GetShelf(currentItem.productID);
 
-        Debug.Log(
-            $"Collected {currentItem.requiredAmount} {currentItem.productID}"
-        );
+        if (targetShelf == null)
+            return;
+
+        int amountNeeded = currentItem.requiredAmount;
+
+        for (int i = 0; i < amountNeeded; i++)
+        {
+            GameObject product = targetShelf.Stock.TryTakeProduct();
+
+            if (product != null)
+            {
+                cartInventory.AddProduct(
+                    currentItem.productID,
+                    product
+                );
+            }
+            else
+            {
+                Debug.Log($"Shelf is out of {currentItem.productID}");
+                break;
+            }
+        }
 
         currentItemIndex++;
 
