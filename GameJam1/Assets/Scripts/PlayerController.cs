@@ -104,23 +104,23 @@ public class PlayerController : MonoBehaviour
         isDashing = true;
 
         Vector3 dashDirection = moveInput.magnitude > 0.1f ? moveInput : transform.forward;
+        float elapsedTime = 0f;
 
-        float startTime = Time.time;
-
-    
-        while (Time.time < startTime + dashDuration)
+        while (elapsedTime < dashDuration)
         {
-            rb.linearVelocity = dashDirection * dashSpeed;
-            yield return null; 
+            Vector3 targetDashPos = rb.position + dashDirection * dashSpeed * Time.fixedDeltaTime;
+            rb.MovePosition(targetDashPos);
+
+            elapsedTime += Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
         }
 
-   
         rb.linearVelocity = Vector3.zero; 
         isDashing = false;
-        
-        yield return new WaitForSeconds(dashCooldown);//cooldown
+    
+        yield return new WaitForSeconds(dashCooldown);
         canDash = true;
-    }
+        }
 
     private void OnCollisionEnter(Collision collision)
     {
