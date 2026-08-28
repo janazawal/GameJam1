@@ -2,6 +2,7 @@ using NUnit.Framework.Interfaces;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [Serializable]
 public class GoalRequirement
@@ -56,7 +57,10 @@ public class GoalManager : MonoBehaviour
 
     private void CheckProgress()
     {
-        if (hasWon) return;
+        if (hasWon)
+        {
+            UnlockNewLevel();
+        }
 
         OnGoalProgressChanged?.Invoke();
 
@@ -68,5 +72,15 @@ public class GoalManager : MonoBehaviour
 
         hasWon = true;
         OnWin?.Invoke();
+    }
+
+    private void UnlockNewLevel()
+    {
+        if(SceneManager.GetActiveScene().buildIndex>=PlayerPrefs.GetInt("ReachedIndex"))
+        {
+            PlayerPrefs.SetInt("ReachedIndex", SceneManager.GetActiveScene().buildIndex + 1);
+            PlayerPrefs.SetInt("UnlockedLevel", PlayerPrefs.GetInt("UnlockedLevel", 1) + 1);
+            PlayerPrefs.Save();
+        }
     }
 }
