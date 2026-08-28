@@ -121,4 +121,12 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(dashCooldown);//cooldown
         canDash = true;
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (isDashing && collision.gameObject.CompareTag("Enemy"))
+        {
+            collision.gameObject.SendMessage("TakeKnockout", transform.forward, SendMessageOptions.DontRequireReceiver);
+        }
+    }
 }
