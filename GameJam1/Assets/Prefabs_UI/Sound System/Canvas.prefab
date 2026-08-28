@@ -305,6 +305,7 @@ GameObject:
   - component: {fileID: 6719892083995720536}
   - component: {fileID: 9160983084210721368}
   - component: {fileID: 3241958078784150926}
+  - component: {fileID: 5301710691547705738}
   m_Layer: 5
   m_Name: Resume Button
   m_TagString: Untagged
@@ -426,6 +427,22 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &5301710691547705738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2033332773450756892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b0a3855b1f9b134aa0b733df826a04b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonAnimation
+  hoverScale: 1.1
+  clickScale: 0.9
+  duration: 0.15
+  ignoreTimeScale: 1
 --- !u!1 &2114812370388401566
 GameObject:
   m_ObjectHideFlags: 0
@@ -579,6 +596,7 @@ GameObject:
   - component: {fileID: 5988702951870966711}
   - component: {fileID: 2466125470826845001}
   - component: {fileID: 481745123665171538}
+  - component: {fileID: 1322483072977308557}
   m_Layer: 5
   m_Name: Home Button
   m_TagString: Untagged
@@ -700,6 +718,22 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &1322483072977308557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2654791921906073200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b0a3855b1f9b134aa0b733df826a04b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonAnimation
+  hoverScale: 1.1
+  clickScale: 0.9
+  duration: 0.15
+  ignoreTimeScale: 1
 --- !u!1 &3138778377252396856
 GameObject:
   m_ObjectHideFlags: 0
@@ -713,6 +747,7 @@ GameObject:
   - component: {fileID: 447763501955254840}
   - component: {fileID: 2970515505990305252}
   - component: {fileID: 1073270823926129038}
+  - component: {fileID: 1759128682838809444}
   m_Layer: 5
   m_Name: Pause Button
   m_TagString: Untagged
@@ -737,7 +772,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -393, y: 0}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &418322174610740691
@@ -847,6 +882,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PauseSystem
   pauseMenu: {fileID: 5063050542929965795}
+--- !u!114 &1759128682838809444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3138778377252396856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b0a3855b1f9b134aa0b733df826a04b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonAnimation
+  hoverScale: 1.1
+  clickScale: 0.9
+  duration: 0.15
+  ignoreTimeScale: 1
 --- !u!1 &3490995054304694890
 GameObject:
   m_ObjectHideFlags: 0
