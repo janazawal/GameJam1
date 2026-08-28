@@ -5,7 +5,7 @@ using TMPro;
 public class GoalUI : MonoBehaviour
 {
     [SerializeField] private GoalManager goalManager;
-    [SerializeField] private GameObject winPanel; // optional, shown on win
+    
 
     [Header("Needed to WIN")]
     [SerializeField] private Image[] goalImages;
@@ -17,14 +17,14 @@ public class GoalUI : MonoBehaviour
     private void OnEnable()
     {
         goalManager.OnGoalProgressChanged += RefreshUI;
-        goalManager.OnWin += ShowWin;
+        
         RefreshUI();
     }
 
     private void OnDisable()
     {
         goalManager.OnGoalProgressChanged -= RefreshUI;
-        goalManager.OnWin -= ShowWin;
+       
     }
 
     private void RefreshUI()
@@ -54,9 +54,5 @@ public class GoalUI : MonoBehaviour
 
     
 
-    private void ShowWin()
-    {
-        if (winPanel) winPanel.SetActive(true);
-        Debug.Log("Player won!");
-    }
+   
 }

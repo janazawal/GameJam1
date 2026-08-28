@@ -16,6 +16,7 @@ public class PauseSystem : MonoBehaviour
     }
     public void Pause()
     {
+        SoundManager.PlaySound(SoundType.Button);
         pauseMenu.SetActive(true);
         isPaused = true;
         Time.timeScale = 0f;
@@ -23,6 +24,7 @@ public class PauseSystem : MonoBehaviour
     }
     public void Resume()
     {
+        SoundManager.PlaySound(SoundType.Button);
         pauseMenu.SetActive(false);
         isPaused = false;
         Time.timeScale = 1f;
@@ -30,6 +32,7 @@ public class PauseSystem : MonoBehaviour
     }
     public void Home(int SceneID)
     {
+        SoundManager.PlaySound(SoundType.Button);
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneID);
     }
