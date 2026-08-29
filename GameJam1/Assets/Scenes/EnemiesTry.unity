@@ -2505,6 +2505,9 @@ MonoBehaviour:
   wanderPoints:
   - {fileID: 388746900}
   - {fileID: 60981207}
+  - {fileID: 746240728}
+  - {fileID: 413924875}
+  - {fileID: 2117948430}
   enemies:
   - spawnPoint: {fileID: 221729473}
     shoppingList:
