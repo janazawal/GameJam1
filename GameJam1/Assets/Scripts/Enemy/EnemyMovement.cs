@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyMovement : MonoBehaviour
+public class EnemyMovement : CharacterAnimation
 {
     [SerializeField] private float walkSpeed = 3f;
     [SerializeField] private float runSpeed = 6f;
@@ -13,14 +13,19 @@ public class EnemyMovement : MonoBehaviour
 
     public event Action OnDestinationReached;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         agent = GetComponent<NavMeshAgent>();
     }
 
     private void Update()
     {
         CheckDestinationReached();
+        if (agent != null)
+        {
+            SetWalking(agent.velocity.magnitude > 0.1f);
+        }
     }
 
     public void MoveTo(Vector3 destination)

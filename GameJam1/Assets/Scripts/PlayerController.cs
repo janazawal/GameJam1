@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : CharacterAnimation
 {
     [Header("Movement Settings")]
     public float moveSpeed = 8f;
@@ -23,13 +23,15 @@ public class PlayerController : MonoBehaviour
     private Vector2 rawInputVector;
     private PlayerInputActions inputActions;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         inputActions = new PlayerInputActions();
     }
 
-    private void OnEnable()
+    protected override void OnEnable()
     {
+        base.OnEnable();
         inputActions.Player.Enable();
 
         inputActions.Player.Move.performed += OnMovePerformed;
@@ -37,8 +39,9 @@ public class PlayerController : MonoBehaviour
         inputActions.Player.Dash.performed += OnDashPerformed;
     }
 
-    private void OnDisable()
+    protected override void OnDisable()
     {
+        base.OnDisable();
         inputActions.Player.Move.performed -= OnMovePerformed;
         inputActions.Player.Move.canceled -= OnMoveCanceled;
         inputActions.Player.Dash.performed -= OnDashPerformed;
@@ -50,7 +53,6 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
     }
-
 
     private void OnMovePerformed(InputAction.CallbackContext context)
     {
@@ -75,10 +77,14 @@ public class PlayerController : MonoBehaviour
         if (isStunned)
         {
             moveInput = Vector3.zero;
+            SetWalking(false);
             return;
         }
 
         moveInput = new Vector3(rawInputVector.x, 0f, rawInputVector.y).normalized;
+
+        SetWalking(moveInput.magnitude > 0.1f);
+        
     }
     void FixedUpdate()
     {
@@ -103,6 +109,8 @@ public class PlayerController : MonoBehaviour
         canDash = false;
         isDashing = true;
 
+        SetDashing(true);
+
         Vector3 dashDirection = moveInput.magnitude > 0.1f ? moveInput : transform.forward;
         float elapsedTime = 0f;
 
@@ -117,6 +125,8 @@ public class PlayerController : MonoBehaviour
 
         rb.linearVelocity = Vector3.zero; 
         isDashing = false;
+
+        SetDashing(false);
     
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
