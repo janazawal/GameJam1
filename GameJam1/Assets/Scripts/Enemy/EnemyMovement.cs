@@ -4,11 +4,14 @@ using UnityEngine.AI;
 
 public class EnemyMovement : MonoBehaviour
 {
+    [SerializeField] private float walkSpeed = 3f;
+    [SerializeField] private float runSpeed = 6f;
+
     private NavMeshAgent agent;
 
-    public event Action OnDestinationReached;
+    private bool trackDestination;
 
-    private bool isMoving;
+    public event Action OnDestinationReached;
 
     private void Awake()
     {
@@ -25,8 +28,23 @@ public class EnemyMovement : MonoBehaviour
         if (!agent.isOnNavMesh)
             return;
 
+        agent.speed = walkSpeed;
+
+        trackDestination = true;
+
         agent.SetDestination(destination);
-        isMoving = true;
+    }
+
+    public void Chase(Vector3 destination)
+    {
+        if (!agent.isOnNavMesh)
+            return;
+
+        agent.speed = runSpeed;
+
+        trackDestination = false;
+
+        agent.SetDestination(destination);
     }
 
     public void Stop()
@@ -35,20 +53,25 @@ public class EnemyMovement : MonoBehaviour
             return;
 
         agent.ResetPath();
-        isMoving = false;
+
+        trackDestination = false;
     }
 
     private void CheckDestinationReached()
     {
-        if (!isMoving)
+        if (!trackDestination)
             return;
 
         if (agent.pathPending)
             return;
 
+        if (!agent.hasPath)
+            return;
+
         if (agent.remainingDistance <= agent.stoppingDistance)
         {
-            isMoving = false;
+            trackDestination = false;
+
             OnDestinationReached?.Invoke();
         }
     }
