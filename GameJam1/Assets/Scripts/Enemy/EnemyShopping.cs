@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,9 +8,22 @@ public class EnemyShopping : MonoBehaviour
     [SerializeField] private List<ShoppingItem> shoppingList;
     [SerializeField] private ShelfRegistry shelfRegistry;
     [SerializeField] private CartInventory cartInventory;
+    [SerializeField] private float collectDelay = 1f;
+
     private EnemyMovement movement;
 
     private int currentItemIndex;
+    private int collectedFromCurrentItem;
+
+    private bool isPaused;
+    private bool isCollecting;
+    private bool shoppingComplete;
+
+    private Coroutine collectRoutine;
+
+    public bool IsShoppingComplete => shoppingComplete;
+
+    public event Action OnShoppingCompleted;
 
     private void Awake()
     {
@@ -25,66 +40,178 @@ public class EnemyShopping : MonoBehaviour
         movement.OnDestinationReached -= HandleDestinationReached;
     }
 
-    private void Start()
+    public void Initialize(
+       List<ShoppingItem> newShoppingList,
+       ShelfRegistry registry)
     {
+        shoppingList =
+            new List<ShoppingItem>(newShoppingList);
+
+        shelfRegistry = registry;
+
+        currentItemIndex = 0;
+        collectedFromCurrentItem = 0;
+        shoppingComplete = false;
+        isPaused = false;
+
+        GoToCurrentProduct();
+    }
+    public void PauseShopping()
+    {
+        if (shoppingComplete)
+            return;
+
+        isPaused = true;
+
+        if (collectRoutine != null)
+        {
+            StopCoroutine(collectRoutine);
+            collectRoutine = null;
+        }
+
+        isCollecting = false;
+
+        movement.Stop();
+    }
+
+    public void ResumeShopping()
+    {
+        if (shoppingComplete)
+            return;
+
+        isPaused = false;
+
         GoToCurrentProduct();
     }
 
     private void GoToCurrentProduct()
     {
+        if (isPaused)
+            return;
+
         if (currentItemIndex >= shoppingList.Count)
         {
-            Debug.Log("Shopping Complete");
+            CompleteShopping();
             return;
         }
 
-        ShoppingItem currentItem = shoppingList[currentItemIndex];
+        ShoppingItem currentItem =
+            shoppingList[currentItemIndex];
 
-        Shelf targetShelf = shelfRegistry.GetShelf(currentItem.productID);
+        Shelf targetShelf =
+            shelfRegistry.GetShelf(currentItem.productID);
 
         if (targetShelf == null)
         {
-            Debug.LogWarning($"No shelf found for {currentItem.productID}");
+            Debug.LogWarning(
+                $"No shelf found for {currentItem.productID}"
+            );
+
             return;
         }
 
-        movement.MoveTo(targetShelf.InteractionPoint.position);
+        movement.MoveTo(
+            targetShelf.InteractionPoint.position
+        );
     }
 
     private void HandleDestinationReached()
     {
-        if (currentItemIndex >= shoppingList.Count)
+        if (isPaused)
             return;
 
-        ShoppingItem currentItem = shoppingList[currentItemIndex];
+        if (shoppingComplete)
+            return;
 
-        Shelf targetShelf = shelfRegistry.GetShelf(currentItem.productID);
+        if (isCollecting)
+            return;
+
+        collectRoutine =
+            StartCoroutine(CollectCurrentProduct());
+    }
+
+    private IEnumerator CollectCurrentProduct()
+    {
+        isCollecting = true;
+
+        ShoppingItem currentItem =
+            shoppingList[currentItemIndex];
+
+        Shelf targetShelf =
+            shelfRegistry.GetShelf(currentItem.productID);
 
         if (targetShelf == null)
-            return;
-
-        int amountNeeded = currentItem.requiredAmount;
-
-        for (int i = 0; i < amountNeeded; i++)
         {
-            GameObject product = targetShelf.Stock.TryTakeProduct();
+            isCollecting = false;
+            collectRoutine = null;
 
-            if (product != null)
+            yield break;
+        }
+
+        while (
+            collectedFromCurrentItem <
+            currentItem.requiredAmount
+        )
+        {
+            if (isPaused)
             {
-                cartInventory.AddProduct(
-                    currentItem.productID,
-                    product
-                );
+                isCollecting = false;
+                collectRoutine = null;
+
+                yield break;
             }
-            else
+
+            GameObject product =
+                targetShelf.Stock.TryTakeProduct();
+
+            if (product == null)
             {
-                Debug.Log($"Shelf is out of {currentItem.productID}");
+                Debug.LogWarning(
+                    $"No more {currentItem.productID}"
+                );
+
                 break;
             }
+
+            cartInventory.AddProduct(
+                currentItem.productID,
+                product
+            );
+
+            collectedFromCurrentItem++;
+
+            Debug.Log(
+                $"Collected {currentItem.productID} " +
+                $"{collectedFromCurrentItem}/" +
+                $"{currentItem.requiredAmount}"
+            );
+
+            yield return new WaitForSeconds(
+                collectDelay
+            );
         }
+
+        collectedFromCurrentItem = 0;
 
         currentItemIndex++;
 
+        isCollecting = false;
+        collectRoutine = null;
+
         GoToCurrentProduct();
+    }
+
+    private void CompleteShopping()
+    {
+        if (shoppingComplete)
+            return;
+
+        shoppingComplete = true;
+
+        movement.Stop();
+
+        Debug.Log("Shopping Complete");
+
+        OnShoppingCompleted?.Invoke();
     }
 }
