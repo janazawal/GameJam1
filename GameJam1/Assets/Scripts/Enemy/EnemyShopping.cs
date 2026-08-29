@@ -40,11 +40,22 @@ public class EnemyShopping : MonoBehaviour
         movement.OnDestinationReached -= HandleDestinationReached;
     }
 
-    private void Start()
+    public void Initialize(
+       List<ShoppingItem> newShoppingList,
+       ShelfRegistry registry)
     {
+        shoppingList =
+            new List<ShoppingItem>(newShoppingList);
+
+        shelfRegistry = registry;
+
+        currentItemIndex = 0;
+        collectedFromCurrentItem = 0;
+        shoppingComplete = false;
+        isPaused = false;
+
         GoToCurrentProduct();
     }
-
     public void PauseShopping()
     {
         if (shoppingComplete)

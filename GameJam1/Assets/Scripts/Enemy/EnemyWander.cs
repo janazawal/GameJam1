@@ -3,38 +3,45 @@ using UnityEngine;
 
 public class EnemyWander : MonoBehaviour
 {
-    [SerializeField]
-    private Transform[] wanderPoints;
+    [SerializeField] private Transform[] wanderPoints;
 
-    [SerializeField]
-    private float minWaitTime = 0.5f;
-
-    [SerializeField]
-    private float maxWaitTime = 1.5f;
+    [Header("Waiting")]
+    [SerializeField] private float minWaitTime = 0.5f;
+    [SerializeField] private float maxWaitTime = 1.5f;
 
     private EnemyMovement movement;
 
-    private int currentPointIndex;
-    private bool isWandering;
+    private int currentPointIndex = 0;
+
+    private bool isWandering = false;
+    private bool isWaiting = false;
 
     public bool IsWandering => isWandering;
 
     private void Awake()
     {
-        movement =
-            GetComponent<EnemyMovement>();
+        movement = GetComponent<EnemyMovement>();
     }
 
     private void OnEnable()
     {
-        movement.OnDestinationReached +=
-            HandleDestinationReached;
+        if (movement != null)
+        {
+            movement.OnDestinationReached += HandleDestinationReached;
+        }
     }
 
     private void OnDisable()
     {
-        movement.OnDestinationReached -=
-            HandleDestinationReached;
+        if (movement != null)
+        {
+            movement.OnDestinationReached -= HandleDestinationReached;
+        }
+    }
+
+    public void SetWanderPoints(Transform[] points)
+    {
+        wanderPoints = points;
     }
 
     public void StartWandering()
@@ -42,28 +49,29 @@ public class EnemyWander : MonoBehaviour
         if (isWandering)
             return;
 
-        if (wanderPoints == null ||
-            wanderPoints.Length == 0)
+        if (wanderPoints == null || wanderPoints.Length == 0)
         {
-            Debug.LogWarning(
-                "Enemy has no Wander Points"
-            );
-
+            Debug.LogWarning("No Wander Points assigned");
             return;
         }
 
         isWandering = true;
+        isWaiting = false;
 
-        GoToNextPoint();
+        GoToCurrentPoint();
     }
 
     public void StopWandering()
     {
         isWandering = false;
+        isWaiting = false;
 
         StopAllCoroutines();
 
-        movement.Stop();
+        if (movement != null)
+        {
+            movement.Stop();
+        }
     }
 
     private void HandleDestinationReached()
@@ -71,42 +79,64 @@ public class EnemyWander : MonoBehaviour
         if (!isWandering)
             return;
 
-        StartCoroutine(
-            WaitThenContinue()
-        );
+        if (isWaiting)
+            return;
+
+        StartCoroutine(WaitThenMove());
     }
 
-    private IEnumerator WaitThenContinue()
+    private IEnumerator WaitThenMove()
     {
-        float delay =
+        isWaiting = true;
+
+        float waitTime =
             Random.Range(
                 minWaitTime,
                 maxWaitTime
             );
 
-        yield return new WaitForSeconds(delay);
+        yield return new WaitForSeconds(waitTime);
 
         if (!isWandering)
+        {
+            isWaiting = false;
             yield break;
-
-        GoToNextPoint();
-    }
-
-    private void GoToNextPoint()
-    {
-        Transform point =
-            wanderPoints[currentPointIndex];
-
-        movement.MoveTo(
-            point.position
-        );
+        }
 
         currentPointIndex++;
 
-        if (currentPointIndex >=
-            wanderPoints.Length)
+        if (currentPointIndex >= wanderPoints.Length)
         {
             currentPointIndex = 0;
         }
+
+        isWaiting = false;
+
+        GoToCurrentPoint();
+    }
+
+    private void GoToCurrentPoint()
+    {
+        if (!isWandering)
+            return;
+
+        if (wanderPoints == null || wanderPoints.Length == 0)
+            return;
+
+        Transform targetPoint =
+            wanderPoints[currentPointIndex];
+
+        if (targetPoint == null)
+        {
+            Debug.LogWarning(
+                "One of the Wander Points is missing"
+            );
+
+            return;
+        }
+
+        movement.MoveTo(
+            targetPoint.position
+        );
     }
 }
