@@ -109,7 +109,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ai.navigation": {
-      "version": "2.0.13",
+      "version": "2.0.14",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -127,6 +127,19 @@
       },
       "url": "https://packages.unity.com"
     },
+<<<<<<< Updated upstream
+=======
+    "com.unity.cinemachine": {
+      "version": "3.1.7",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.splines": "2.0.0",
+        "com.unity.modules.imgui": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+>>>>>>> Stashed changes
     "com.unity.cloud.gltfast": {
       "version": "6.20.0",
       "depth": 0,
@@ -141,10 +154,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.collab-proxy": {
-      "version": "2.12.4",
+      "version": "2.13.5",
       "depth": 0,
       "source": "registry",
-      "dependencies": {},
+      "dependencies": {
+        "com.unity.collections": "2.6.8"
+      },
       "url": "https://packages.unity.com"
     },
     "com.unity.collections": {
