@@ -23,6 +23,8 @@ public class ButtonAnimation : MonoBehaviour,
     {
         originalScale = transform.localScale;
         button = GetComponent<Button>();
+        // Erase if you dont have sound manager script
+        GetComponent<Button>().onClick.AddListener(PlayButtonSound);
     }
 
     private void OnEnable()
@@ -74,5 +76,15 @@ public class ButtonAnimation : MonoBehaviour,
         LeanTween.scale(gameObject, targetScale, duration)
             .setEase(LeanTweenType.easeOutBack)
             .setIgnoreTimeScale(ignoreTimeScale);
+    }
+
+
+    // Erase if you dont have sound manager script
+    private void PlayButtonSound()
+
+    {
+
+        SoundManager.PlaySound(SoundType.Button);
+
     }
 }

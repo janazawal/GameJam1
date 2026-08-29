@@ -57,10 +57,8 @@ public class GoalManager : MonoBehaviour
 
     private void CheckProgress()
     {
-        if (hasWon)
-        {
-            UnlockNewLevel();
-        }
+        if (hasWon) return;
+        
 
         OnGoalProgressChanged?.Invoke();
 
@@ -71,6 +69,7 @@ public class GoalManager : MonoBehaviour
         }
 
         hasWon = true;
+        UnlockNewLevel();
         OnWin?.Invoke();
     }
 
