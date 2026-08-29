@@ -11,10 +11,10 @@ public class EnemyWander : MonoBehaviour
 
     private EnemyMovement movement;
 
-    private int currentPointIndex = 0;
-
     private bool isWandering = false;
     private bool isWaiting = false;
+
+    private int lastPointIndex = -1;
 
     public bool IsWandering => isWandering;
 
@@ -58,7 +58,7 @@ public class EnemyWander : MonoBehaviour
         isWandering = true;
         isWaiting = false;
 
-        GoToCurrentPoint();
+        GoToRandomPoint();
     }
 
     public void StopWandering()
@@ -103,19 +103,12 @@ public class EnemyWander : MonoBehaviour
             yield break;
         }
 
-        currentPointIndex++;
-
-        if (currentPointIndex >= wanderPoints.Length)
-        {
-            currentPointIndex = 0;
-        }
-
         isWaiting = false;
 
-        GoToCurrentPoint();
+        GoToRandomPoint();
     }
 
-    private void GoToCurrentPoint()
+    private void GoToRandomPoint()
     {
         if (!isWandering)
             return;
@@ -123,8 +116,29 @@ public class EnemyWander : MonoBehaviour
         if (wanderPoints == null || wanderPoints.Length == 0)
             return;
 
+        int randomIndex;
+
+        if (wanderPoints.Length == 1)
+        {
+            randomIndex = 0;
+        }
+        else
+        {
+            do
+            {
+                randomIndex =
+                    Random.Range(
+                        0,
+                        wanderPoints.Length
+                    );
+            }
+            while (randomIndex == lastPointIndex);
+        }
+
+        lastPointIndex = randomIndex;
+
         Transform targetPoint =
-            wanderPoints[currentPointIndex];
+            wanderPoints[randomIndex];
 
         if (targetPoint == null)
         {
