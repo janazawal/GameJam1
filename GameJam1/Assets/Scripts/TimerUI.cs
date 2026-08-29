@@ -6,15 +6,16 @@ public class TimerUI : MonoBehaviour
 {
     [SerializeField] private GoalManager goalManager;
     [SerializeField] private TMP_Text timerText;
-    [SerializeField] private GameObject winPanel;
-    [SerializeField] private GameObject losePanel;
+    
     [SerializeField] private float startTime = 60f;
+    [SerializeField] private float warningThreshold = 10f;
     [SerializeField] private bool startOnEnable = true;
 
     public event Action OnTimerFinished;
 
     private float timeRemaining;
     private bool isRunning;
+    private bool warningSoundPlayed;
 
     private void OnEnable()
     {
@@ -26,6 +27,7 @@ public class TimerUI : MonoBehaviour
     {
         timeRemaining = duration;
         isRunning = true;
+        warningSoundPlayed = false;
         UpdateTimerText();
     }
 
@@ -37,6 +39,14 @@ public class TimerUI : MonoBehaviour
         if (!isRunning) return;
 
         timeRemaining -= Time.deltaTime;
+
+        if (!warningSoundPlayed && timeRemaining <= warningThreshold)
+        {
+            warningSoundPlayed = true;
+            SoundManager.PlaySound(SoundType.Timer);
+            
+        }
+
 
         if (timeRemaining <= 0f)
         {
@@ -53,14 +63,13 @@ public class TimerUI : MonoBehaviour
     private void FinishTimer()
     {
         OnTimerFinished?.Invoke();
-
         if (HasMetAllGoals())
         {
-            if (winPanel) winPanel.SetActive(true);
+            UIManager.Instance.ShowWinPanel();
         }
         else
         {
-            if (losePanel) losePanel.SetActive(true);
+            UIManager.Instance.ShowLosePanel();
         }
     }
 

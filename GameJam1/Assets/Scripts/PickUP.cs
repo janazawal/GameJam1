@@ -60,7 +60,7 @@ public class PickUP : MonoBehaviour
     private void OnInteractPerformed(InputAction.CallbackContext context)
     {
         if (!playerInRange || playerPocket == null) return;
-
+        SoundManager.PlaySound(SoundType.PickUp);
         bool added = playerPocket.AddItem(item);
         if (added)
         {
