@@ -38,13 +38,16 @@ public class UIManager : MonoBehaviour
     }
     public void ShowWinPanel()
     {
-
+        SoundManager.StopSound(SoundType.Timer);
+        SoundManager.PlaySound(SoundType.Win);
         if (winPanel != null) winPanel.SetActive(true);
         Time.timeScale = 0f;
     }
 
     public void ShowLosePanel()
     {
+        SoundManager.StopSound(SoundType.Timer);
+        SoundManager.PlaySound(SoundType.Lose);
         if (losePanel != null) losePanel.SetActive(true);
         Time.timeScale = 0f; 
     }
