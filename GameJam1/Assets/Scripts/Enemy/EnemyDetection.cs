@@ -10,13 +10,15 @@ public class EnemyDetection : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player"))
+        Transform player = other.transform.root;
+
+        if (!player.CompareTag("Player"))
             return;
 
         if (currentPlayer != null)
             return;
 
-        currentPlayer = other.transform;
+        currentPlayer = player;
 
         Debug.Log("PLAYER DETECTED");
 
@@ -25,10 +27,12 @@ public class EnemyDetection : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (!other.CompareTag("Player"))
+        Transform player = other.transform.root;
+
+        if (!player.CompareTag("Player"))
             return;
 
-        if (other.transform != currentPlayer)
+        if (player != currentPlayer)
             return;
 
         Debug.Log("PLAYER LOST");

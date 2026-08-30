@@ -2,11 +2,17 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : CharacterAnimation
+public class PlayerController : MonoBehaviour
 {
+    [SerializeField] private float wallCheckDistance = 1f;
+    [SerializeField] private LayerMask wallLayer;
+
     [Header("Movement Settings")]
     public float moveSpeed = 8f;
     public float rotationSpeed = 10f;
+
+    [Header("Camera")]
+    [SerializeField] private Transform cameraTransform;
 
     [Header("Dash Settings")]
     public float dashSpeed = 25f;
@@ -16,22 +22,20 @@ public class PlayerController : CharacterAnimation
     public bool isDashing = false;
 
     [Header("State")]
-    public bool isStunned = false;//when the player is knockedout
+    public bool isStunned = false;
 
     private Rigidbody rb;
     private Vector3 moveInput;
     private Vector2 rawInputVector;
     private PlayerInputActions inputActions;
 
-    protected override void Awake()
+    private void Awake()
     {
-        base.Awake();
         inputActions = new PlayerInputActions();
     }
 
-    protected override void OnEnable()
+    private void OnEnable()
     {
-        base.OnEnable();
         inputActions.Player.Enable();
 
         inputActions.Player.Move.performed += OnMovePerformed;
@@ -39,17 +43,16 @@ public class PlayerController : CharacterAnimation
         inputActions.Player.Dash.performed += OnDashPerformed;
     }
 
-    protected override void OnDisable()
+    private void OnDisable()
     {
-        base.OnDisable();
         inputActions.Player.Move.performed -= OnMovePerformed;
         inputActions.Player.Move.canceled -= OnMoveCanceled;
         inputActions.Player.Dash.performed -= OnDashPerformed;
 
         inputActions.Player.Disable();
     }
-    
-    void Start()
+
+    private void Start()
     {
         rb = GetComponent<Rigidbody>();
     }
@@ -72,36 +75,81 @@ public class PlayerController : CharacterAnimation
         }
     }
 
-    void Update()
+    private void Update()
     {
         if (isStunned)
         {
             moveInput = Vector3.zero;
-            SetWalking(false);
             return;
         }
 
-        moveInput = new Vector3(rawInputVector.x, 0f, rawInputVector.y).normalized;
+        if (rawInputVector.magnitude < 0.2f)
+        {
+            rawInputVector = Vector2.zero;
+        }
 
-        SetWalking(moveInput.magnitude > 0.1f);
-        
+        Vector3 cameraForward = cameraTransform.forward;
+        Vector3 cameraRight = cameraTransform.right;
+
+        cameraForward.y = 0f;
+        cameraRight.y = 0f;
+
+        cameraForward.Normalize();
+        cameraRight.Normalize();
+
+        moveInput =
+            cameraForward * rawInputVector.y +
+            cameraRight * rawInputVector.x;
+
+        moveInput.Normalize();
     }
     void FixedUpdate()
     {
-        if (isStunned) return;
+        if (isStunned)
+            return;
 
-        MovePlayer();
+        if (!isDashing)
+        {
+            MovePlayer();
+        }
     }
 
     void MovePlayer()
     {
         if (moveInput.magnitude > 0.1f)
         {
-            Vector3 targetPosition = rb.position + moveInput * moveSpeed * Time.fixedDeltaTime;
+            float currentSpeed = isDashing ? dashSpeed : moveSpeed;
+
+            if (isDashing)
+            {
+                bool hitWall = Physics.Raycast(
+                    transform.position + Vector3.up * 0.5f,
+                    moveInput,
+                    wallCheckDistance,
+                    wallLayer
+                );
+
+                if (hitWall)
+                {
+                    return;
+                }
+            }
+
+            Vector3 targetPosition =
+                rb.position + moveInput * currentSpeed * Time.fixedDeltaTime;
+
             rb.MovePosition(targetPosition);
 
-            Quaternion targetRotation = Quaternion.LookRotation(moveInput);
-            rb.rotation = Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+            if (rawInputVector.y >= 0f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(moveInput);
+
+                rb.rotation = Quaternion.Slerp(
+                    rb.rotation,
+                    targetRotation,
+                    rotationSpeed * Time.fixedDeltaTime
+                );
+            }
         }
     }
     IEnumerator PerformDash()
@@ -109,34 +157,93 @@ public class PlayerController : CharacterAnimation
         canDash = false;
         isDashing = true;
 
-        SetDashing(true);
+        Vector3 dashDirection =
+            moveInput.magnitude > 0.1f
+            ? moveInput.normalized
+            : transform.forward;
 
-        Vector3 dashDirection = moveInput.magnitude > 0.1f ? moveInput : transform.forward;
         float elapsedTime = 0f;
 
         while (elapsedTime < dashDuration)
         {
-            Vector3 targetDashPos = rb.position + dashDirection * dashSpeed * Time.fixedDeltaTime;
-            rb.MovePosition(targetDashPos);
+            float dashStep = dashSpeed * Time.fixedDeltaTime;
+
+            RaycastHit hit;
+
+            // بيكشف باستخدام جسم الـRigidbody نفسه
+            if (rb.SweepTest(
+                dashDirection,
+                out hit,
+                dashStep,
+                QueryTriggerInteraction.Ignore))
+            {
+                // وقف قبل الحيطة بشوية
+                float safeDistance = Mathf.Max(hit.distance - 0.05f, 0f);
+
+                rb.MovePosition(
+                    rb.position + dashDirection * safeDistance
+                );
+
+                break;
+            }
+
+            rb.MovePosition(
+                rb.position + dashDirection * dashStep
+            );
 
             elapsedTime += Time.fixedDeltaTime;
+
             yield return new WaitForFixedUpdate();
         }
 
-        rb.linearVelocity = Vector3.zero; 
+        rb.linearVelocity = Vector3.zero;
+
         isDashing = false;
 
-        SetDashing(false);
-    
         yield return new WaitForSeconds(dashCooldown);
-        canDash = true;
-        }
 
+        canDash = true;
+    }
     private void OnCollisionEnter(Collision collision)
     {
-        if (isDashing && collision.gameObject.CompareTag("Enemy"))
+        if (!isDashing)
+            return;
+
+        TryKnockoutEnemy(collision.collider);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!isDashing)
+            return;
+
+        TryKnockoutEnemy(other);
+    }
+
+    private void TryKnockoutEnemy(Collider hitCollider)
+    {
+        EnemyKnockout enemyKnockout =
+            hitCollider.GetComponentInParent<EnemyKnockout>();
+
+        if (enemyKnockout == null)
         {
-            collision.gameObject.SendMessage("TakeKnockout", transform.forward, SendMessageOptions.DontRequireReceiver);
+            Debug.Log(
+                "I HIT: " + hitCollider.name +
+                " | NO EnemyKnockout FOUND"
+            );
+
+            return;
         }
+
+        Debug.Log(
+            "ENEMY FOUND: " +
+            enemyKnockout.gameObject.name
+        );
+
+        enemyKnockout.TakeKnockout(
+            transform.forward
+        );
+
+        Debug.Log("KNOCKOUT SENT TO ENEMY");
     }
 }

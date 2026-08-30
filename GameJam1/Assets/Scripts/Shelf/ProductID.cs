@@ -2,5 +2,7 @@ public enum ProductID
 {
     Milk,
     Bread,
-    Apple
+    Apple,
+    Noodles,
+    Mango
 }

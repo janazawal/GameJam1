@@ -19,8 +19,27 @@ public class TimerUI : MonoBehaviour
 
     private void OnEnable()
     {
+        if (goalManager != null)
+            goalManager.OnWin += HandleWin;
+
         if (startOnEnable)
             StartTimer(startTime);
+    }
+
+    private void OnDisable()
+    {
+        if (goalManager != null)
+            goalManager.OnWin -= HandleWin;
+    }
+
+    private void HandleWin()
+    {
+        if (!isRunning)
+            return;
+
+        isRunning = false;
+
+        UIManager.Instance.ShowWinPanel();
     }
 
     public void StartTimer(float duration)
