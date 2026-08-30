@@ -3,6 +3,7 @@ using UnityEngine;
 public class CharacterAnimation : MonoBehaviour
 {
     protected Animator anim;
+    [SerializeField] private ParticleSystem stunParticleEffect;
 
     protected virtual void Awake()
     {
@@ -45,5 +46,17 @@ public class CharacterAnimation : MonoBehaviour
     public void SetKnockedOut(bool isKnockedOut)
     {
         if (anim != null) anim.SetBool("isKnockedout", isKnockedOut);
+        
+        if (stunParticleEffect != null)
+        {
+            if (isKnockedOut)
+            {
+                stunParticleEffect.Play();
+            }
+            else
+            {
+                stunParticleEffect.Stop();
+            }
+        }
     }
 }
