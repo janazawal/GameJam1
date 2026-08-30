@@ -1408,7 +1408,7 @@ GameObject:
   - component: {fileID: 2412397213077592512}
   - component: {fileID: -1910666364257368214}
   - component: {fileID: 716995396067631957}
-  - component: {fileID: -7737270763209374121}
+  - component: {fileID: 3019308483260830578}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -1569,28 +1569,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KnockoutTimerUI
   timerText: {fileID: 1887826691740875010}
---- !u!95 &-7737270763209374121
-Animator:
-  serializedVersion: 7
+--- !u!114 &3019308483260830578
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8707712018335136395}
   m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: fd88605e710eb2e4e99c1408ecfcf6bb, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 844655d7c32df8d48aad35dc547e7433, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimation
+  stunParticleEffect: {fileID: 0}
 --- !u!1001 &8959273334565776067
 PrefabInstance:
   m_ObjectHideFlags: 0
