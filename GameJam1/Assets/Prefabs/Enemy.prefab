@@ -1408,7 +1408,7 @@ GameObject:
   - component: {fileID: 2412397213077592512}
   - component: {fileID: -1910666364257368214}
   - component: {fileID: 716995396067631957}
-  - component: {fileID: 9021782218799113393}
+  - component: {fileID: 3019308483260830578}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -1555,8 +1555,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f641c447ed4391842b800583453ba590, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyKnockout
-  knockoutDuration: 3
-  knockoutTimerUI: {fileID: 716995396067631957}
+  knockoutTimerUI: {fileID: 0}
 --- !u!114 &716995396067631957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1570,7 +1569,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KnockoutTimerUI
   timerText: {fileID: 1887826691740875010}
---- !u!114 &9021782218799113393
+--- !u!114 &3019308483260830578
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
