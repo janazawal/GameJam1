@@ -1639,10 +1639,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   stunParticleEffect: {fileID: 4412392233661439709}
-  wallCheckDistance: 1
-  wallLayer:
-    serializedVersion: 2
-    m_Bits: 64
   moveSpeed: 8
   rotationSpeed: 10
   dashSpeed: 30

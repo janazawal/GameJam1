@@ -3,6 +3,7 @@ using UnityEngine;
 public class CharacterAnimation : MonoBehaviour
 {
     protected Animator anim;
+
     [SerializeField] private ParticleSystem stunParticleEffect;
 
     protected virtual void Awake()
@@ -13,6 +14,7 @@ public class CharacterAnimation : MonoBehaviour
     protected virtual void OnEnable()
     {
         PlayerKnockout knockout = GetComponent<PlayerKnockout>();
+
         if (knockout != null)
         {
             knockout.OnKnockedOut += HandleKnockout;
@@ -23,6 +25,7 @@ public class CharacterAnimation : MonoBehaviour
     protected virtual void OnDisable()
     {
         PlayerKnockout knockout = GetComponent<PlayerKnockout>();
+
         if (knockout != null)
         {
             knockout.OnKnockedOut -= HandleKnockout;
@@ -30,23 +33,39 @@ public class CharacterAnimation : MonoBehaviour
         }
     }
 
-    private void HandleKnockout() => SetKnockedOut(true);
-    private void HandleRecovered() => SetKnockedOut(false);
+    private void HandleKnockout()
+    {
+        SetKnockedOut(true);
+    }
+
+    private void HandleRecovered()
+    {
+        SetKnockedOut(false);
+    }
 
     public void SetWalking(bool isWalking)
     {
-        if (anim != null) anim.SetBool("isWalking", isWalking);
+        if (anim != null)
+        {
+            anim.SetBool("isWalking", isWalking);
+        }
     }
 
     public void SetDashing(bool isDashing)
     {
-        if (anim != null) anim.SetBool("isDashing", isDashing);
+        if (anim != null)
+        {
+            anim.SetBool("isDashing", isDashing);
+        }
     }
 
     public void SetKnockedOut(bool isKnockedOut)
     {
-        if (anim != null) anim.SetBool("isKnockedout", isKnockedOut);
-        
+        if (anim != null)
+        {
+            anim.SetBool("isKnockedOut", isKnockedOut);
+        }
+
         if (stunParticleEffect != null)
         {
             if (isKnockedOut)

@@ -6,6 +6,7 @@ public class EnemyBrain : MonoBehaviour
     private EnemyShopping shopping;
     private EnemyWander wander;
     private EnemyCombat combat;
+    private EnemyKnockout enemyKnockout;
 
     private void Awake()
     {
@@ -20,23 +21,22 @@ public class EnemyBrain : MonoBehaviour
 
         combat =
             GetComponent<EnemyCombat>();
+
+        enemyKnockout =
+            GetComponent<EnemyKnockout>();
     }
 
     private void OnEnable()
     {
         if (detection != null)
         {
-            detection.OnPlayerDetected +=
-                HandlePlayerDetected;
-
-            detection.OnPlayerLost +=
-                HandlePlayerLost;
+            detection.OnPlayerDetected += HandlePlayerDetected;
+            detection.OnPlayerLost += HandlePlayerLost;
         }
 
         if (shopping != null)
         {
-            shopping.OnShoppingCompleted +=
-                HandleShoppingCompleted;
+            shopping.OnShoppingCompleted += HandleShoppingCompleted;
         }
     }
 
@@ -44,27 +44,54 @@ public class EnemyBrain : MonoBehaviour
     {
         if (detection != null)
         {
-            detection.OnPlayerDetected -=
-                HandlePlayerDetected;
-
-            detection.OnPlayerLost -=
-                HandlePlayerLost;
+            detection.OnPlayerDetected -= HandlePlayerDetected;
+            detection.OnPlayerLost -= HandlePlayerLost;
         }
 
         if (shopping != null)
         {
-            shopping.OnShoppingCompleted -=
-                HandleShoppingCompleted;
+            shopping.OnShoppingCompleted -= HandleShoppingCompleted;
         }
     }
 
     private void HandlePlayerDetected(Transform player)
     {
-        shopping.PauseShopping();
+        // Enemy نفسه Knocked Out
+        if (enemyKnockout != null &&
+            enemyKnockout.IsKnockedOut)
+        {
+            return;
+        }
 
-        wander.StopWandering();
+        if (player == null)
+            return;
 
-        combat.StartCombat(player);
+        PlayerKnockout playerKnockout =
+            player.GetComponent<PlayerKnockout>();
+
+        // متهاجمش Player واقع
+        if (playerKnockout != null &&
+            playerKnockout.IsKnockedOut)
+        {
+            return;
+        }
+
+        if (shopping != null)
+        {
+            shopping.PauseShopping();
+        }
+
+        if (wander != null)
+        {
+            wander.StopWandering();
+        }
+
+        if (combat != null)
+        {
+            combat.StartCombat(player);
+        }
+
+        Debug.Log("Enemy -> COMBAT");
     }
 
     private void HandlePlayerLost(Transform player)
@@ -74,28 +101,35 @@ public class EnemyBrain : MonoBehaviour
 
     public void LeaveCombatAndResumeTask()
     {
-        combat.StopCombat();
+        if (combat != null)
+        {
+            combat.StopCombat();
+        }
 
         if (shopping != null &&
             !shopping.IsShoppingComplete)
         {
             shopping.ResumeShopping();
 
-            Debug.Log("Enemy returned to Shopping");
+            Debug.Log("Enemy -> SHOPPING");
         }
-        else
+        else if (wander != null)
         {
             wander.StartWandering();
 
-            Debug.Log("Enemy returned to Wandering");
+            Debug.Log("Enemy -> WANDERING");
         }
     }
 
     private void HandleShoppingCompleted()
     {
-        if (!combat.IsInCombat)
+        if (combat != null &&
+            !combat.IsInCombat)
         {
-            wander.StartWandering();
+            if (wander != null)
+            {
+                wander.StartWandering();
+            }
         }
     }
 }

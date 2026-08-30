@@ -4,18 +4,15 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : CharacterAnimation
 {
-    [SerializeField] private float wallCheckDistance = 1f;
-    [SerializeField] private LayerMask wallLayer;
-
     [Header("Movement Settings")]
     public float moveSpeed = 8f;
     public float rotationSpeed = 10f;
-
 
     [Header("Dash Settings")]
     public float dashSpeed = 25f;
     public float dashDuration = 0.5f;
     public float dashCooldown = 1.5f;
+
     private bool canDash = true;
     public bool isDashing = false;
 
@@ -23,19 +20,29 @@ public class PlayerController : CharacterAnimation
     public bool isStunned = false;
 
     private Rigidbody rb;
+
     private Vector3 moveInput;
     private Vector2 rawInputVector;
+
     private PlayerInputActions inputActions;
 
     protected override void Awake()
     {
         base.Awake();
+
         inputActions = new PlayerInputActions();
+        rb = GetComponent<Rigidbody>();
+
+        if (rb == null)
+        {
+            rb = GetComponentInParent<Rigidbody>();
+        }
     }
 
     protected override void OnEnable()
     {
         base.OnEnable();
+
         inputActions.Player.Enable();
 
         inputActions.Player.Move.performed += OnMovePerformed;
@@ -46,6 +53,7 @@ public class PlayerController : CharacterAnimation
     protected override void OnDisable()
     {
         base.OnDisable();
+
         inputActions.Player.Move.performed -= OnMovePerformed;
         inputActions.Player.Move.canceled -= OnMoveCanceled;
         inputActions.Player.Dash.performed -= OnDashPerformed;
@@ -53,27 +61,28 @@ public class PlayerController : CharacterAnimation
         inputActions.Player.Disable();
     }
 
-    private void Start()
-    {
-        rb = GetComponentInParent<Rigidbody>();
-    }
-
-    private void OnMovePerformed(InputAction.CallbackContext context)
+    private void OnMovePerformed(
+        InputAction.CallbackContext context)
     {
         rawInputVector = context.ReadValue<Vector2>();
     }
 
-    private void OnMoveCanceled(InputAction.CallbackContext context)
+    private void OnMoveCanceled(
+        InputAction.CallbackContext context)
     {
         rawInputVector = Vector2.zero;
     }
 
-    private void OnDashPerformed(InputAction.CallbackContext context)
+    private void OnDashPerformed(
+        InputAction.CallbackContext context)
     {
-        if (canDash && !isStunned)
-        {
-            StartCoroutine(PerformDash());
-        }
+        if (!canDash)
+            return;
+
+        if (isStunned)
+            return;
+
+        StartCoroutine(PerformDash());
     }
 
     private void Update()
@@ -81,7 +90,9 @@ public class PlayerController : CharacterAnimation
         if (isStunned)
         {
             moveInput = Vector3.zero;
+
             SetWalking(false);
+
             return;
         }
 
@@ -90,63 +101,71 @@ public class PlayerController : CharacterAnimation
             rawInputVector = Vector2.zero;
         }
 
-        moveInput = new Vector3(rawInputVector.x, 0f, rawInputVector.y).normalized;
-        SetWalking(moveInput.magnitude > 0.1f);
+        moveInput =
+            new Vector3(
+                rawInputVector.x,
+                0f,
+                rawInputVector.y
+            ).normalized;
+
+        if (!isDashing)
+        {
+            SetWalking(
+                moveInput.magnitude > 0.1f
+            );
+        }
     }
-    void FixedUpdate()
+
+    private void FixedUpdate()
     {
         if (isStunned)
             return;
 
-        if (!isDashing)
-        {
-            MovePlayer();
-        }
+        if (isDashing)
+            return;
+
+        MovePlayer();
     }
 
-    void MovePlayer()
+    // =========================
+    // NORMAL MOVEMENT
+    // =========================
+
+    private void MovePlayer()
     {
-        if (moveInput.magnitude > 0.1f)
-        {
-            float currentSpeed = isDashing ? dashSpeed : moveSpeed;
+        if (moveInput.magnitude <= 0.1f)
+            return;
 
-            if (isDashing)
-            {
-                bool hitWall = Physics.Raycast(
-                    transform.position + Vector3.up * 0.5f,
-                    moveInput,
-                    wallCheckDistance,
-                    wallLayer
-                );
+        Vector3 targetPosition =
+            rb.position +
+            moveInput *
+            moveSpeed *
+            Time.fixedDeltaTime;
 
-                if (hitWall)
-                {
-                    return;
-                }
-            }
+        rb.MovePosition(targetPosition);
 
-            Vector3 targetPosition =
-                rb.position + moveInput * currentSpeed * Time.fixedDeltaTime;
+        Quaternion targetRotation =
+            Quaternion.LookRotation(moveInput);
 
-            rb.MovePosition(targetPosition);
-
-            //if (rawInputVector.y >= 0f)
-            //{
-                Quaternion targetRotation = Quaternion.LookRotation(moveInput);
-
-                rb.rotation = Quaternion.Slerp(
-                    rb.rotation,
-                    targetRotation,
-                    rotationSpeed * Time.fixedDeltaTime
-                );
-            //}
-        }
+        rb.rotation =
+            Quaternion.Slerp(
+                rb.rotation,
+                targetRotation,
+                rotationSpeed *
+                Time.fixedDeltaTime
+            );
     }
-    IEnumerator PerformDash()
+
+    // =========================
+    // DASH
+    // =========================
+
+    private IEnumerator PerformDash()
     {
         canDash = false;
         isDashing = true;
 
+        SetWalking(false);
         SetDashing(true);
 
         Vector3 dashDirection =
@@ -158,54 +177,126 @@ public class PlayerController : CharacterAnimation
 
         while (elapsedTime < dashDuration)
         {
-            float dashStep = dashSpeed * Time.fixedDeltaTime;
+            if (isStunned)
+                break;
+
+            float dashStep =
+                dashSpeed *
+                Time.fixedDeltaTime;
 
             RaycastHit hit;
 
-            // بيكشف باستخدام جسم الـRigidbody نفسه
+            // شوف هل هنخبط في حاجة
             if (rb.SweepTest(
                 dashDirection,
                 out hit,
                 dashStep,
                 QueryTriggerInteraction.Ignore))
             {
-                // وقف قبل الحيطة بشوية
-                float safeDistance = Mathf.Max(hit.distance - 0.05f, 0f);
+                // =========================
+                // هل الحاجة Enemy؟
+                // =========================
+
+                EnemyKnockout enemyKnockout =
+                    hit.collider
+                    .GetComponentInParent<EnemyKnockout>();
+
+                if (enemyKnockout != null)
+                {
+                    Debug.Log(
+                        "DASH HIT ENEMY: " +
+                        enemyKnockout.gameObject.name
+                    );
+
+                    enemyKnockout.TakeKnockout(
+                        dashDirection
+                    );
+
+                    // اتحرك لحد الـEnemy
+                    float moveDistance =
+                        Mathf.Max(
+                            hit.distance - 0.05f,
+                            0f
+                        );
+
+                    rb.MovePosition(
+                        rb.position +
+                        dashDirection *
+                        moveDistance
+                    );
+
+                    break;
+                }
+
+                // =========================
+                // مش Enemy = حائط / Shelf
+                // =========================
+
+                float safeDistance =
+                    Mathf.Max(
+                        hit.distance - 0.05f,
+                        0f
+                    );
 
                 rb.MovePosition(
-                    rb.position + dashDirection * safeDistance
+                    rb.position +
+                    dashDirection *
+                    safeDistance
                 );
 
                 break;
             }
 
+            // مفيش حاجة قدامنا
             rb.MovePosition(
-                rb.position + dashDirection * dashStep
+                rb.position +
+                dashDirection *
+                dashStep
             );
 
-            elapsedTime += Time.fixedDeltaTime;
+            elapsedTime +=
+                Time.fixedDeltaTime;
 
-            yield return new WaitForFixedUpdate();
+            yield return
+                new WaitForFixedUpdate();
         }
 
-        rb.linearVelocity = Vector3.zero;
+        rb.linearVelocity =
+            Vector3.zero;
 
         isDashing = false;
+
         SetDashing(false);
 
-        yield return new WaitForSeconds(dashCooldown);
+        SetWalking(
+            moveInput.magnitude > 0.1f
+        );
+
+        yield return
+            new WaitForSeconds(
+                dashCooldown
+            );
 
         canDash = true;
     }
-    private void OnCollisionEnter(Collision collision)
+
+    // =========================
+    // EXTRA COLLISION CHECK
+    // =========================
+
+    private void OnCollisionEnter(
+        Collision collision)
     {
         if (!isDashing)
             return;
 
-        TryKnockoutEnemy(collision.collider);
+        TryKnockoutEnemy(
+            collision.collider
+        );
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(
+        Collider other)
     {
         if (!isDashing)
             return;
@@ -213,30 +304,30 @@ public class PlayerController : CharacterAnimation
         TryKnockoutEnemy(other);
     }
 
-    private void TryKnockoutEnemy(Collider hitCollider)
+    // =========================
+    // KNOCKOUT ENEMY
+    // =========================
+
+    private void TryKnockoutEnemy(
+        Collider hitCollider)
     {
         EnemyKnockout enemyKnockout =
-            hitCollider.GetComponentInParent<EnemyKnockout>();
+            hitCollider
+            .GetComponentInParent<EnemyKnockout>();
 
         if (enemyKnockout == null)
-        {
-            Debug.Log(
-                "I HIT: " + hitCollider.name +
-                " | NO EnemyKnockout FOUND"
-            );
-
             return;
-        }
+
+        if (enemyKnockout.IsKnockedOut)
+            return;
 
         Debug.Log(
-            "ENEMY FOUND: " +
+            "PLAYER KNOCKED OUT ENEMY: " +
             enemyKnockout.gameObject.name
         );
 
         enemyKnockout.TakeKnockout(
             transform.forward
         );
-
-        Debug.Log("KNOCKOUT SENT TO ENEMY");
     }
 }

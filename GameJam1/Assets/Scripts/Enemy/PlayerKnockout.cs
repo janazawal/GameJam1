@@ -4,16 +4,12 @@ using UnityEngine;
 
 public class PlayerKnockout : MonoBehaviour
 {
-    [Header("Knockout")]
     [SerializeField] private float knockoutDuration = 5f;
-
-    [Header("UI")]
     [SerializeField] private KnockoutTimerUI knockoutTimerUI;
 
-    private bool isKnockedOut;
     private PlayerController playerController;
 
-    public bool IsKnockedOut => isKnockedOut;
+    public bool IsKnockedOut { get; private set; }
 
     public event Action OnKnockedOut;
     public event Action OnRecovered;
@@ -21,11 +17,23 @@ public class PlayerKnockout : MonoBehaviour
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
+
+        if (playerController == null)
+        {
+            playerController = GetComponentInParent<PlayerController>();
+        }
+
+        if (playerController == null)
+        {
+            playerController = GetComponentInChildren<PlayerController>();
+        }
     }
 
     public void ApplyKnockout()
     {
-        if (isKnockedOut)
+        Debug.Log("APPLY KNOCKOUT CALLED");
+
+        if (IsKnockedOut)
             return;
 
         StartCoroutine(KnockoutRoutine());
@@ -33,17 +41,22 @@ public class PlayerKnockout : MonoBehaviour
 
     private IEnumerator KnockoutRoutine()
     {
-        isKnockedOut = true;
+        IsKnockedOut = true;
 
-        // وقف حركة و Dash الـPlayer
+        Debug.Log("PLAYER IS NOW KNOCKED OUT");
+
         if (playerController != null)
         {
             playerController.isStunned = true;
+
+            Debug.Log("PLAYER STUNNED = TRUE");
+        }
+        else
+        {
+            Debug.LogError("PLAYER CONTROLLER NOT FOUND");
         }
 
         OnKnockedOut?.Invoke();
-
-        Debug.Log("Player Knocked Out");
 
         float timer = knockoutDuration;
 
@@ -64,16 +77,17 @@ public class PlayerKnockout : MonoBehaviour
             knockoutTimerUI.Hide();
         }
 
-        isKnockedOut = false;
+        IsKnockedOut = false;
 
-        // رجع التحكم للـPlayer
         if (playerController != null)
         {
             playerController.isStunned = false;
+
+            Debug.Log("PLAYER STUNNED = FALSE");
         }
 
         OnRecovered?.Invoke();
 
-        Debug.Log("Player Recovered");
+        Debug.Log("PLAYER RECOVERED");
     }
 }

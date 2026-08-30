@@ -5,19 +5,20 @@ using UnityEngine.AI;
 public class EnemyCombat : MonoBehaviour
 {
     [Header("Chase")]
-    [SerializeField] private float attackRange = 2.5f;
+    [SerializeField] private float attackRange = 3.5f;
+    [SerializeField] private float attackStopDistance = 1.5f;
 
     [Header("Cart Attack")]
-    [SerializeField] private float backDistance = 1f;
-    [SerializeField] private float maxChargeDistance = 3f;
+    [SerializeField] private float backDistance = 1.2f;
+    [SerializeField] private float chargeDistance = 4f;
 
     [SerializeField] private float backDuration = 0.4f;
-    [SerializeField] private float chargeDuration = 0.3f;
+    [SerializeField] private float chargeDuration = 0.45f;
 
     [SerializeField] private float attackCooldown = 2f;
 
-    [Header("Attack Distance")]
-    [SerializeField] private float attackStopDistance = 1.3f;
+    [Header("Knockout Hit")]
+    [SerializeField] private float knockoutDistance = 2f;
 
     private EnemyMovement movement;
     private NavMeshAgent agent;
@@ -25,10 +26,10 @@ public class EnemyCombat : MonoBehaviour
 
     private Transform target;
 
-    private bool isAttacking;
-    private bool isKnockedOut;
+    private bool isAttacking = false;
+    private bool isKnockedOut = false;
 
-    private float nextAttackTime;
+    private float nextAttackTime = 0f;
 
     public bool IsInCombat => target != null;
     public bool IsKnockedOut => isKnockedOut;
@@ -52,10 +53,10 @@ public class EnemyCombat : MonoBehaviour
             return;
 
         PlayerKnockout playerKnockout =
-            target.GetComponent<PlayerKnockout>();
+            target.GetComponentInParent<PlayerKnockout>();
 
-        // لو الـPlayer already knocked out
-        // سيبه ومتكملش ضرب
+        // لو الـPlayer Knocked Out بالفعل
+        // الـEnemy يسيبه ويرجع لمهمته
         if (playerKnockout != null &&
             playerKnockout.IsKnockedOut)
         {
@@ -63,118 +64,114 @@ public class EnemyCombat : MonoBehaviour
             return;
         }
 
-        float distanceToPlayer =
+        float distance =
             Vector3.Distance(
                 transform.position,
                 target.position
             );
 
-        if (distanceToPlayer > attackRange)
+        if (distance > attackRange)
         {
             ChasePlayer();
         }
         else
         {
-            movement.Stop();
+            if (movement != null)
+                movement.Stop();
 
             TryAttack();
         }
     }
 
-    // =========================
+    // =====================================================
     // START COMBAT
-    // =========================
+    // =====================================================
 
     public void StartCombat(Transform player)
     {
         if (isKnockedOut)
             return;
 
+        if (player == null)
+            return;
+
+        PlayerKnockout playerKnockout =
+            player.GetComponentInParent<PlayerKnockout>();
+
+        if (playerKnockout != null &&
+            playerKnockout.IsKnockedOut)
+        {
+            return;
+        }
+
         target = player;
 
-        Debug.Log("Combat Started");
+        Debug.Log("ENEMY -> COMBAT START");
     }
 
-    // =========================
+    // =====================================================
     // STOP COMBAT
-    // =========================
+    // =====================================================
 
     public void StopCombat()
     {
         StopAllCoroutines();
 
         isAttacking = false;
-
         target = null;
 
         if (movement != null)
-        {
             movement.Stop();
-        }
-
-        Debug.Log("Combat Stopped");
     }
 
-    // =========================
+    // =====================================================
     // LEAVE PLAYER
-    // =========================
+    // =====================================================
 
     private void LeavePlayer()
     {
         StopAllCoroutines();
 
         isAttacking = false;
-
         target = null;
 
         if (movement != null)
-        {
             movement.Stop();
-        }
 
         if (brain != null)
-        {
             brain.LeaveCombatAndResumeTask();
-        }
     }
 
-    // =========================
-    // KNOCKOUT
-    // =========================
+    // =====================================================
+    // ENEMY KNOCKOUT STATE
+    // =====================================================
 
     public void SetKnockedOut(bool value)
     {
         isKnockedOut = value;
 
-        if (isKnockedOut)
+        if (value)
         {
             StopAllCoroutines();
 
             isAttacking = false;
+            target = null;
 
             if (movement != null)
-            {
                 movement.Stop();
-            }
-
-            Debug.Log("Enemy Combat Disabled");
-        }
-        else
-        {
-            Debug.Log("Enemy Combat Enabled");
         }
     }
 
-    // =========================
+    // =====================================================
     // CHASE
-    // =========================
+    // =====================================================
 
     private void ChasePlayer()
     {
         if (target == null)
             return;
 
-        if (isKnockedOut)
+        if (movement == null)
             return;
 
         Vector3 direction =
@@ -195,13 +192,16 @@ public class EnemyCombat : MonoBehaviour
         movement.Chase(stopPosition);
     }
 
-    // =========================
+    // =====================================================
     // TRY ATTACK
-    // =========================
+    // =====================================================
 
     private void TryAttack()
     {
         if (isKnockedOut)
+            return;
+
+        if (isAttacking)
             return;
 
         if (Time.time < nextAttackTime)
@@ -213,28 +213,28 @@ public class EnemyCombat : MonoBehaviour
         StartCoroutine(CartAttack());
     }
 
-    // =========================
+    // =====================================================
     // CART ATTACK
-    // =========================
+    // =====================================================
 
     private IEnumerator CartAttack()
     {
         if (target == null)
             yield break;
 
-        if (isKnockedOut)
-            yield break;
-
         isAttacking = true;
 
-        movement.Stop();
+        Transform player = target;
 
-        // =========================
-        // اتجاه الـPlayer
-        // =========================
+        if (movement != null)
+            movement.Stop();
+
+        // ---------------------------
+        // Face Player
+        // ---------------------------
 
         Vector3 direction =
-            target.position -
+            player.position -
             transform.position;
 
         direction.y = 0f;
@@ -250,18 +250,19 @@ public class EnemyCombat : MonoBehaviour
         transform.rotation =
             Quaternion.LookRotation(direction);
 
-        // وقفة صغيرة قبل الهجوم
         yield return new WaitForSeconds(0.15f);
 
-        if (isKnockedOut)
+        if (player == null || isKnockedOut)
         {
             isAttacking = false;
             yield break;
         }
 
-        // =========================
-        // 1. يرجع لورا
-        // =========================
+        // =================================================
+        // BACK
+        // =================================================
+
+        Debug.Log("ENEMY BACK");
 
         yield return MoveEnemy(
             -direction,
@@ -269,24 +270,18 @@ public class EnemyCombat : MonoBehaviour
             backDuration
         );
 
-        if (target == null)
+        if (player == null || isKnockedOut)
         {
             isAttacking = false;
             yield break;
         }
 
-        if (isKnockedOut)
-        {
-            isAttacking = false;
-            yield break;
-        }
-
-        // =========================
-        // تحديث اتجاه الـPlayer
-        // =========================
+        // ---------------------------
+        // Face Player Again
+        // ---------------------------
 
         direction =
-            target.position -
+            player.position -
             transform.position;
 
         direction.y = 0f;
@@ -302,86 +297,160 @@ public class EnemyCombat : MonoBehaviour
         transform.rotation =
             Quaternion.LookRotation(direction);
 
-        // =========================
-        // حساب مسافة الـCharge
-        // =========================
+        yield return new WaitForSeconds(0.1f);
 
-        float distanceToPlayer =
-            Vector3.Distance(
-                transform.position,
-                target.position
-            );
+        // =================================================
+        // CHARGE
+        // =================================================
 
-        float actualChargeDistance =
-            distanceToPlayer -
-            attackStopDistance;
+        Debug.Log("ENEMY CHARGE");
 
-        actualChargeDistance =
-            Mathf.Clamp(
-                actualChargeDistance,
-                0f,
-                maxChargeDistance
-            );
+        float elapsed = 0f;
 
-        // =========================
-        // 2. Charge
-        // =========================
+        float chargeSpeed =
+            chargeDistance /
+            Mathf.Max(chargeDuration, 0.01f);
 
-        if (actualChargeDistance > 0f)
+        while (elapsed < chargeDuration)
         {
-            yield return MoveEnemy(
-                direction,
-                actualChargeDistance,
-                chargeDuration
-            );
+            if (player == null || isKnockedOut)
+            {
+                isAttacking = false;
+                yield break;
+            }
+
+            // -----------------------------------------
+            // كل Frame نشوف هل وصلنا للـPlayer
+            // -----------------------------------------
+
+            float distanceToPlayer =
+                Vector3.Distance(
+                    transform.position,
+                    player.position
+                );
+
+            if (distanceToPlayer <= knockoutDistance)
+            {
+                KnockoutPlayer(player);
+                yield break;
+            }
+
+            // -----------------------------------------
+            // اتحرك ناحية Player
+            // -----------------------------------------
+
+            Vector3 currentDirection =
+                player.position -
+                transform.position;
+
+            currentDirection.y = 0f;
+
+            if (currentDirection.sqrMagnitude > 0.01f)
+            {
+                currentDirection.Normalize();
+
+                transform.rotation =
+                    Quaternion.LookRotation(
+                        currentDirection
+                    );
+
+                Vector3 step =
+                    currentDirection *
+                    chargeSpeed *
+                    Time.deltaTime;
+
+                if (agent != null &&
+                    agent.isOnNavMesh)
+                {
+                    agent.Move(step);
+                }
+                else
+                {
+                    transform.position += step;
+                }
+            }
+
+            elapsed += Time.deltaTime;
+
+            yield return null;
         }
 
-        if (isKnockedOut)
-        {
-            isAttacking = false;
-            yield break;
-        }
+        // =================================================
+        // FINAL CHECK
+        // =================================================
 
-        // =========================
-        // 3. Hit Player
-        // =========================
-
-        if (target != null)
+        if (player != null)
         {
             float finalDistance =
                 Vector3.Distance(
                     transform.position,
-                    target.position
+                    player.position
                 );
 
-            if (finalDistance <= attackRange)
+            if (finalDistance <= knockoutDistance)
             {
-                PlayerKnockout knockout =
-                    target.GetComponent<PlayerKnockout>();
-
-                if (knockout != null &&
-                    !knockout.IsKnockedOut)
-                {
-                    knockout.ApplyKnockout();
-
-                    Debug.Log("Player hit by cart!");
-
-                    isAttacking = false;
-
-                    // خلاص ضربه، سيبه وامشي
-                    LeavePlayer();
-
-                    yield break;
-                }
+                KnockoutPlayer(player);
+                yield break;
             }
         }
 
         isAttacking = false;
     }
 
-    // =========================
-    // MANUAL MOVEMENT
-    // =========================
+    // =====================================================
+    // KNOCKOUT PLAYER
+    // =====================================================
+
+    private void KnockoutPlayer(Transform player)
+    {
+        if (player == null)
+        {
+            isAttacking = false;
+            return;
+        }
+
+        PlayerKnockout playerKnockout =
+            player.GetComponentInParent<PlayerKnockout>();
+
+        // لو الـtarget نفسه root
+        if (playerKnockout == null)
+        {
+            playerKnockout =
+                player.GetComponent<PlayerKnockout>();
+        }
+
+        if (playerKnockout == null)
+        {
+            Debug.LogError(
+                "PLAYER KNOCKOUT SCRIPT NOT FOUND!"
+            );
+
+            isAttacking = false;
+            return;
+        }
+
+        if (playerKnockout.IsKnockedOut)
+        {
+            isAttacking = false;
+            LeavePlayer();
+            return;
+        }
+
+        Debug.Log("===== PLAYER KNOCKOUT =====");
+
+        playerKnockout.ApplyKnockout();
+
+        // مهم:
+        // بعد ما يوقع الـPlayer
+        // الـEnemy يبطل يزقه
+        isAttacking = false;
+
+        LeavePlayer();
+    }
+
+    // =====================================================
+    // MANUAL ENEMY MOVEMENT
+    // =====================================================
 
     private IEnumerator MoveEnemy(
         Vector3 direction,
@@ -391,24 +460,36 @@ public class EnemyCombat : MonoBehaviour
         if (distance <= 0f)
             yield break;
 
-        float timer = 0f;
+        if (duration <= 0f)
+            yield break;
 
-        float speed =
-            distance / duration;
+        direction.y = 0f;
+        direction.Normalize();
 
-        while (timer < duration)
+        float elapsed = 0f;
+        float speed = distance / duration;
+
+        while (elapsed < duration)
         {
             if (isKnockedOut)
                 yield break;
 
-            timer += Time.deltaTime;
-
-            Vector3 movementStep =
+            Vector3 step =
                 direction *
                 speed *
                 Time.deltaTime;
 
-            agent.Move(movementStep);
+            if (agent != null &&
+                agent.isOnNavMesh)
+            {
+                agent.Move(step);
+            }
+            else
+            {
+                transform.position += step;
+            }
+
+            elapsed += Time.deltaTime;
 
             yield return null;
         }
