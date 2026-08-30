@@ -10,7 +10,7 @@ public enum SoundType
     PickUp,
     HitEnemy,
     Konckout,
-
+    Dash,
 
 }
 public class SoundManager : MonoBehaviour
