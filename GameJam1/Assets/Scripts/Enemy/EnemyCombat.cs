@@ -21,27 +21,47 @@ public class EnemyCombat : MonoBehaviour
 
     private EnemyMovement movement;
     private NavMeshAgent agent;
+    private EnemyBrain brain;
 
     private Transform target;
 
     private bool isAttacking;
+    private bool isKnockedOut;
+
     private float nextAttackTime;
 
     public bool IsInCombat => target != null;
+    public bool IsKnockedOut => isKnockedOut;
 
     private void Awake()
     {
         movement = GetComponent<EnemyMovement>();
         agent = GetComponent<NavMeshAgent>();
+        brain = GetComponent<EnemyBrain>();
     }
 
     private void Update()
     {
+        if (isKnockedOut)
+            return;
+
         if (target == null)
             return;
 
         if (isAttacking)
             return;
+
+        PlayerKnockout playerKnockout =
+            target.GetComponent<PlayerKnockout>();
+
+        // لو الـPlayer already knocked out
+        // سيبه ومتكملش ضرب
+        if (playerKnockout != null &&
+            playerKnockout.IsKnockedOut)
+        {
+            LeavePlayer();
+            return;
+        }
 
         float distanceToPlayer =
             Vector3.Distance(
@@ -61,28 +81,100 @@ public class EnemyCombat : MonoBehaviour
         }
     }
 
+    // =========================
+    // START COMBAT
+    // =========================
+
     public void StartCombat(Transform player)
     {
+        if (isKnockedOut)
+            return;
+
         target = player;
 
         Debug.Log("Combat Started");
     }
 
+    // =========================
+    // STOP COMBAT
+    // =========================
+
     public void StopCombat()
     {
-        if (isAttacking)
-            return;
+        StopAllCoroutines();
+
+        isAttacking = false;
 
         target = null;
 
-        movement.Stop();
+        if (movement != null)
+        {
+            movement.Stop();
+        }
 
         Debug.Log("Combat Stopped");
     }
 
+    // =========================
+    // LEAVE PLAYER
+    // =========================
+
+    private void LeavePlayer()
+    {
+        StopAllCoroutines();
+
+        isAttacking = false;
+
+        target = null;
+
+        if (movement != null)
+        {
+            movement.Stop();
+        }
+
+        if (brain != null)
+        {
+            brain.LeaveCombatAndResumeTask();
+        }
+    }
+
+    // =========================
+    // KNOCKOUT
+    // =========================
+
+    public void SetKnockedOut(bool value)
+    {
+        isKnockedOut = value;
+
+        if (isKnockedOut)
+        {
+            StopAllCoroutines();
+
+            isAttacking = false;
+
+            if (movement != null)
+            {
+                movement.Stop();
+            }
+
+            Debug.Log("Enemy Combat Disabled");
+        }
+        else
+        {
+            Debug.Log("Enemy Combat Enabled");
+        }
+    }
+
+    // =========================
+    // CHASE
+    // =========================
+
     private void ChasePlayer()
     {
         if (target == null)
+            return;
+
+        if (isKnockedOut)
             return;
 
         Vector3 direction =
@@ -103,8 +195,15 @@ public class EnemyCombat : MonoBehaviour
         movement.Chase(stopPosition);
     }
 
+    // =========================
+    // TRY ATTACK
+    // =========================
+
     private void TryAttack()
     {
+        if (isKnockedOut)
+            return;
+
         if (Time.time < nextAttackTime)
             return;
 
@@ -114,9 +213,16 @@ public class EnemyCombat : MonoBehaviour
         StartCoroutine(CartAttack());
     }
 
+    // =========================
+    // CART ATTACK
+    // =========================
+
     private IEnumerator CartAttack()
     {
         if (target == null)
+            yield break;
+
+        if (isKnockedOut)
             yield break;
 
         isAttacking = true;
@@ -141,12 +247,17 @@ public class EnemyCombat : MonoBehaviour
 
         direction.Normalize();
 
-        // خلي الـEnemy يبص للـPlayer
         transform.rotation =
             Quaternion.LookRotation(direction);
 
         // وقفة صغيرة قبل الهجوم
         yield return new WaitForSeconds(0.15f);
+
+        if (isKnockedOut)
+        {
+            isAttacking = false;
+            yield break;
+        }
 
         // =========================
         // 1. يرجع لورا
@@ -164,8 +275,14 @@ public class EnemyCombat : MonoBehaviour
             yield break;
         }
 
+        if (isKnockedOut)
+        {
+            isAttacking = false;
+            yield break;
+        }
+
         // =========================
-        // نحدث اتجاه الـPlayer
+        // تحديث اتجاه الـPlayer
         // =========================
 
         direction =
@@ -186,7 +303,7 @@ public class EnemyCombat : MonoBehaviour
             Quaternion.LookRotation(direction);
 
         // =========================
-        // 2. نحسب مسافة الـCharge
+        // حساب مسافة الـCharge
         // =========================
 
         float distanceToPlayer =
@@ -207,7 +324,7 @@ public class EnemyCombat : MonoBehaviour
             );
 
         // =========================
-        // 3. يندفع بالكارت لقدام
+        // 2. Charge
         // =========================
 
         if (actualChargeDistance > 0f)
@@ -219,8 +336,14 @@ public class EnemyCombat : MonoBehaviour
             );
         }
 
+        if (isKnockedOut)
+        {
+            isAttacking = false;
+            yield break;
+        }
+
         // =========================
-        // 4. نشوف هل وصل للـPlayer
+        // 3. Hit Player
         // =========================
 
         if (target != null)
@@ -241,15 +364,24 @@ public class EnemyCombat : MonoBehaviour
                 {
                     knockout.ApplyKnockout();
 
-                    Debug.Log(
-                        "Player hit by cart!"
-                    );
+                    Debug.Log("Player hit by cart!");
+
+                    isAttacking = false;
+
+                    // خلاص ضربه، سيبه وامشي
+                    LeavePlayer();
+
+                    yield break;
                 }
             }
         }
 
         isAttacking = false;
     }
+
+    // =========================
+    // MANUAL MOVEMENT
+    // =========================
 
     private IEnumerator MoveEnemy(
         Vector3 direction,
@@ -266,6 +398,9 @@ public class EnemyCombat : MonoBehaviour
 
         while (timer < duration)
         {
+            if (isKnockedOut)
+                yield break;
+
             timer += Time.deltaTime;
 
             Vector3 movementStep =

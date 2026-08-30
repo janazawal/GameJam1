@@ -58,8 +58,7 @@ public class EnemyBrain : MonoBehaviour
         }
     }
 
-    private void HandlePlayerDetected(
-        Transform player)
+    private void HandlePlayerDetected(Transform player)
     {
         shopping.PauseShopping();
 
@@ -68,18 +67,27 @@ public class EnemyBrain : MonoBehaviour
         combat.StartCombat(player);
     }
 
-    private void HandlePlayerLost(
-        Transform player)
+    private void HandlePlayerLost(Transform player)
+    {
+        LeaveCombatAndResumeTask();
+    }
+
+    public void LeaveCombatAndResumeTask()
     {
         combat.StopCombat();
 
-        if (shopping.IsShoppingComplete)
+        if (shopping != null &&
+            !shopping.IsShoppingComplete)
         {
-            wander.StartWandering();
+            shopping.ResumeShopping();
+
+            Debug.Log("Enemy returned to Shopping");
         }
         else
         {
-            shopping.ResumeShopping();
+            wander.StartWandering();
+
+            Debug.Log("Enemy returned to Wandering");
         }
     }
 
