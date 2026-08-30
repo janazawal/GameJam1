@@ -11,8 +11,6 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 8f;
     public float rotationSpeed = 10f;
 
-    [Header("Camera")]
-    [SerializeField] private Transform cameraTransform;
 
     [Header("Dash Settings")]
     public float dashSpeed = 25f;
@@ -88,20 +86,7 @@ public class PlayerController : MonoBehaviour
             rawInputVector = Vector2.zero;
         }
 
-        Vector3 cameraForward = cameraTransform.forward;
-        Vector3 cameraRight = cameraTransform.right;
-
-        cameraForward.y = 0f;
-        cameraRight.y = 0f;
-
-        cameraForward.Normalize();
-        cameraRight.Normalize();
-
-        moveInput =
-            cameraForward * rawInputVector.y +
-            cameraRight * rawInputVector.x;
-
-        moveInput.Normalize();
+        moveInput = new Vector3(rawInputVector.x, 0f, rawInputVector.y).normalized;
     }
     void FixedUpdate()
     {
@@ -140,8 +125,8 @@ public class PlayerController : MonoBehaviour
 
             rb.MovePosition(targetPosition);
 
-            if (rawInputVector.y >= 0f)
-            {
+            //if (rawInputVector.y >= 0f)
+            //{
                 Quaternion targetRotation = Quaternion.LookRotation(moveInput);
 
                 rb.rotation = Quaternion.Slerp(
@@ -149,7 +134,7 @@ public class PlayerController : MonoBehaviour
                     targetRotation,
                     rotationSpeed * Time.fixedDeltaTime
                 );
-            }
+            //}
         }
     }
     IEnumerator PerformDash()
