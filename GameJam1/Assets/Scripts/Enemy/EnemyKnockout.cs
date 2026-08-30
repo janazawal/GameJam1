@@ -4,9 +4,6 @@ using UnityEngine.AI;
 
 public class EnemyKnockout : MonoBehaviour
 {
-    [Header("Knockout")]
-    [SerializeField] private float knockoutDuration = 3f;
-
     [Header("UI")]
     [SerializeField] private KnockoutTimerUI knockoutTimerUI;
 
@@ -33,13 +30,6 @@ public class EnemyKnockout : MonoBehaviour
 
     public void TakeKnockout(Vector3 hitDirection)
     {
-        Debug.Log(
-            "TakeKnockout CALLED on " +
-            gameObject.name +
-            " | already KO = " +
-            isKnockedOut
-        );
-
         if (isKnockedOut)
             return;
 
@@ -48,11 +38,16 @@ public class EnemyKnockout : MonoBehaviour
 
     private IEnumerator KnockoutRoutine()
     {
-        Debug.Log("===== ENEMY KNOCKOUT START =====");
-
         isKnockedOut = true;
 
-        // وقف الحركة فوراً
+        // 1. تشغيل أنيميشن الـ Knockout والنجوم للعدو
+        CharacterAnimation anim = GetComponent<CharacterAnimation>();
+        if (anim != null)
+        {
+            anim.SetKnockedOut(true);
+        }
+
+        // 2. إيقاف الحركة والـ NavMeshAgent تماماً
         if (movement != null)
         {
             movement.Stop();
@@ -63,107 +58,22 @@ public class EnemyKnockout : MonoBehaviour
             agent.ResetPath();
             agent.isStopped = true;
             agent.velocity = Vector3.zero;
+            agent.enabled = false; // إيقاف الناف ميكس نهائياً
         }
 
-        // وقف الـAI
-        if (combat != null)
-        {
-            combat.SetKnockedOut(true);
-            combat.enabled = false;
-        }
+        // 3. تعطيل كل سكربتات الذكاء الاصطناعي للعدو نهائياً
+        if (combat != null) combat.enabled = false;
+        if (shopping != null) shopping.enabled = false;
+        if (wander != null) wander.enabled = false;
+        if (brain != null) brain.enabled = false;
 
-        if (shopping != null)
-        {
-            shopping.PauseShopping();
-            shopping.enabled = false;
-        }
-
-        if (wander != null)
-        {
-            wander.StopWandering();
-            wander.enabled = false;
-        }
-
-        if (brain != null)
-        {
-            brain.enabled = false;
-        }
-
-        // =========================
-        // KNOCKOUT TIMER
-        // =========================
-
-        float timer = knockoutDuration;
-
-        while (timer > 0f)
-        {
-            if (knockoutTimerUI != null)
-            {
-                knockoutTimerUI.ShowTime(timer);
-            }
-
-            timer -= Time.deltaTime;
-
-            yield return null;
-        }
-
+        // 4. إخفاء واجهة الـ UI الخاصة بالتعديل لو موجودة
         if (knockoutTimerUI != null)
         {
             knockoutTimerUI.Hide();
         }
 
-        // =========================
-        // RECOVER
-        // =========================
-
-        isKnockedOut = false;
-
-        if (agent != null && agent.isOnNavMesh)
-        {
-            agent.isStopped = false;
-        }
-
-        if (brain != null)
-        {
-            brain.enabled = true;
-        }
-
-        if (combat != null)
-        {
-            combat.enabled = true;
-            combat.SetKnockedOut(false);
-        }
-
-        if (shopping != null)
-        {
-            shopping.enabled = true;
-        }
-
-        if (wander != null)
-        {
-            wander.enabled = true;
-        }
-
-        // رجعه يكمل الـShopping
-        // ولو خلص Shopping خليه Wander
-        if (shopping != null &&
-            !shopping.IsShoppingComplete)
-        {
-            shopping.ResumeShopping();
-
-            Debug.Log(
-                "Enemy recovered -> Shopping"
-            );
-        }
-        else if (wander != null)
-        {
-            wander.StartWandering();
-
-            Debug.Log(
-                "Enemy recovered -> Wandering"
-            );
-        }
-
-        Debug.Log("===== ENEMY KNOCKOUT END =====");
+        // مسحنا كود الـ Recover أوتوماتيك عشان يفضل مغمى عليه طول الجيم
+        yield break;
     }
 }
