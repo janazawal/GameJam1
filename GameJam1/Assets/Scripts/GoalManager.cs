@@ -50,19 +50,20 @@ public class GoalManager : MonoBehaviour
     }
     private void CheckProgress()
     {
-        if (hasWon)
-        {
-            UnlockNewLevel();
-        }
         OnGoalProgressChanged?.Invoke();
         foreach (var req in requirements)
         {
             if (GetCollectedAmount(req.item) < req.requiredAmount)
                 return; // not all requirements met yet
         }
-        hasWon = true;
-        OnWin?.Invoke();
+        if (!hasWon)
+        {
+            hasWon = true;
+            UnlockNewLevel();
+            OnWin?.Invoke();
+        }
     }
+    
     private void UnlockNewLevel()
     {
         if (SceneManager.GetActiveScene().buildIndex >= PlayerPrefs.GetInt("ReachedIndex"))
