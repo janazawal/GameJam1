@@ -4,5 +4,7 @@ public enum ProductID
     Bread,
     Apple,
     Noodles,
-    Mango
+    Mango,
+    fish,
+    icecream
 }
