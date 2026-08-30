@@ -2494,6 +2494,7 @@ GameObject:
   - component: {fileID: 985469001}
   - component: {fileID: 985469000}
   - component: {fileID: 985469003}
+  - component: {fileID: 985469004}
   m_Layer: 5
   m_Name: Quit
   m_TagString: Untagged
@@ -2564,7 +2565,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 985469001}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 985469004}
+        m_TargetAssemblyTypeName: Quit, Assembly-CSharp
+        m_MethodName: QuitGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &985469001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2619,6 +2632,18 @@ MonoBehaviour:
   clickScale: 0.9
   duration: 0.15
   ignoreTimeScale: 1
+--- !u!114 &985469004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985468998}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c10f3ac9c6527e9458781c2c272fd560, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Quit
 --- !u!1 &999157991
 GameObject:
   m_ObjectHideFlags: 0
@@ -5893,6 +5918,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 760500665715869973, guid: 6ddb57383008ea5449d8b585f9e15634, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3491044417590404310, guid: 6ddb57383008ea5449d8b585f9e15634, type: 3}
+      propertyPath: musicList.Array.size
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

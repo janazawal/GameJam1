@@ -74,6 +74,19 @@ public class UIManager : MonoBehaviour
         SoundManager.StopSFX();
         SoundManager.PlaySound(SoundType.Button);
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+
+        int nextIndex = SceneManager.GetActiveScene().buildIndex + 1;
+
+        if (nextIndex < SceneManager.sceneCountInBuildSettings)
+        {
+            SceneManager.LoadScene(nextIndex);
+        }
+        else
+        {
+            SceneManager.LoadScene("MainMenu");
+        }
     }
+
+   
+
 }
