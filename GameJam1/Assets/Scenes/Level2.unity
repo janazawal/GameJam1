@@ -984,7 +984,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &172004488
 Transform:
   m_ObjectHideFlags: 0
@@ -1017,6 +1017,10 @@ PrefabInstance:
     - target: {fileID: 3980992314252957823, guid: fd513640c1d461140b6fe591332fe3c2, type: 3}
       propertyPath: m_Name
       value: UI Main Canvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 3980992314252957823, guid: fd513640c1d461140b6fe591332fe3c2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5629663145397934871, guid: fd513640c1d461140b6fe591332fe3c2, type: 3}
       propertyPath: m_Pivot.x
@@ -2198,11 +2202,6 @@ MonoBehaviour:
   productVisuals:
   - {fileID: 133893300}
   - {fileID: 8939931571207562600}
---- !u!1 &721474305 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2607583208838829492, guid: 1f158b316abbe6a42acfeab43085c158, type: 3}
-  m_PrefabInstance: {fileID: 2942509383161805883}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &747014229
 GameObject:
   m_ObjectHideFlags: 0
@@ -3077,7 +3076,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 382786c0c4b85304791b56e95eadabf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GoalManager
-  pocket: {fileID: 1049892361294203237}
+  pocket: {fileID: 1211290309}
   requirements:
   - item: {fileID: 11400000, guid: 74119f2a022a0fc4cb719ebb3c5100da, type: 2}
     requiredAmount: 2
@@ -3462,6 +3461,17 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1188921853}
   m_Mesh: {fileID: 1751298120504027682, guid: 1651c6d8a04534148b0b24565224123d, type: 3}
+--- !u!114 &1211290309 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7635514693602098088, guid: 1f158b316abbe6a42acfeab43085c158, type: 3}
+  m_PrefabInstance: {fileID: 2942509383161805883}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca05686ffa020b54192dad971a8bede5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Pocket
 --- !u!1 &1222963826
 GameObject:
   m_ObjectHideFlags: 0
@@ -4539,6 +4549,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1616751401 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+  m_PrefabInstance: {fileID: 2042758726}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1642518423
 GameObject:
   m_ObjectHideFlags: 0
@@ -4873,17 +4888,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1736209105}
   m_Mesh: {fileID: -1498818471487732436, guid: 1651c6d8a04534148b0b24565224123d, type: 3}
---- !u!114 &1764201402 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1599184559509579213, guid: 1f158b316abbe6a42acfeab43085c158, type: 3}
-  m_PrefabInstance: {fileID: 2942509383161805883}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 531d9ae37d411ab4e8ab61604a957fd6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::KnockoutTimerUI
 --- !u!1 &1774897819
 GameObject:
   m_ObjectHideFlags: 0
@@ -5723,6 +5727,75 @@ MonoBehaviour:
   - {fileID: 1825891212}
   - {fileID: 865454054}
   - {fileID: 67957406}
+--- !u!1001 &2042758726
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 6033086448810524520}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.854
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.044
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.338
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 172cb10817b20364494fce48224ea850, type: 3}
+      propertyPath: m_Name
+      value: rabbitCashier_Anim
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 172cb10817b20364494fce48224ea850, type: 3}
 --- !u!1001 &2044024258
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6224,31 +6297,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7091785996195479704, guid: 1f158b316abbe6a42acfeab43085c158, type: 3}
   m_PrefabInstance: {fileID: 2942509383161805883}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1049892361294203236
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 721474305}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c09141d57ab13f24f8c737bc51c16212, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerKnockout
-  knockoutDuration: 5
-  knockoutTimerUI: {fileID: 1764201402}
---- !u!114 &1049892361294203237 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 185616459527115579, guid: 1f158b316abbe6a42acfeab43085c158, type: 3}
-  m_PrefabInstance: {fileID: 2942509383161805883}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 721474305}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca05686ffa020b54192dad971a8bede5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Pocket
 --- !u!4 &1090116829984786878
 Transform:
   m_ObjectHideFlags: 0
@@ -7216,10 +7264,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2607583208838829492, guid: 1f158b316abbe6a42acfeab43085c158, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1049892361294203236}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1f158b316abbe6a42acfeab43085c158, type: 3}
 --- !u!4 &2953228928587375186
 Transform:
@@ -8724,6 +8769,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4125178056000759900}
+  - {fileID: 1616751401}
   m_Father: {fileID: 6569145875915906633}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &6094447883841578775
