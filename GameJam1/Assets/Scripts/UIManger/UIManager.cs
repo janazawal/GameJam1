@@ -38,6 +38,7 @@ public class UIManager : MonoBehaviour
     }
     public void ShowWinPanel()
     {
+
         SoundManager.StopSound(SoundType.Timer);
         SoundManager.PlaySound(SoundType.Win);
         if (winPanel != null) winPanel.SetActive(true);
@@ -54,6 +55,7 @@ public class UIManager : MonoBehaviour
 
     public void RestartGame()
     {
+        SoundManager.StopSFX();
         SoundManager.PlaySound(SoundType.Button);
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -61,6 +63,7 @@ public class UIManager : MonoBehaviour
 
     public void LoadMainMenu()
     {
+        SoundManager.StopSFX();
         SoundManager.PlaySound(SoundType.Button);
         Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu"); 
@@ -68,6 +71,7 @@ public class UIManager : MonoBehaviour
 
     public void LoadNextLevel()
     {
+        SoundManager.StopSFX();
         SoundManager.PlaySound(SoundType.Button);
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);

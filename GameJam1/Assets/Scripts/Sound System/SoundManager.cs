@@ -120,6 +120,12 @@ public class SoundManager : MonoBehaviour
             Instance.timerSource.Stop();
         }
         // other SoundTypes go through PlayOneShot and can't be individually stopped
+
+    }
+    public static void StopSFX()
+    {
+        if (Instance == null) return;
+        Instance.sfxSource.Stop();
     }
     /*  VOLUME  */
     public static void SetMusicVolume(float volume)
